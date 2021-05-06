@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="ir_cron_scheduler_compute_contact_age" model="ir.cron">
+            <field name="name">Compute Contact's Age</field>
+            <field name="model_id" ref="model_res_partner" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="state">code</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+			<field name="code">model.cron_compute_age()</field>
+        </record>
+   </data>
+</odoo>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="menu_plant_and_location" parent="purchase.menu_purchase_config" name="Plant and Locations"
+                  sequence="6"/>
+
+        <record id="location_plant_view_form" model="ir.ui.view">
+            <field name="name">location.plant.form</field>
+            <field name="model">location.plant</field>
+            <field name="arch" type="xml">
+                <form string="Plant Form">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                            <div name="code">
+                                <label for="code" class="oe_inline"/>
+                                <field name="code" class="oe_inline oe_input_align" required="1"/>
+                            </div>
+                            <div name="company_id">
+                                <label for="company_id" class="oe_inline"/>
+                                [<field name="company_code" class="oe_inline"/>]
+                                <field name="company_id" class="oe_inline oe_input_align"
+                                       groups="base.group_multi_company" required="1"
+                                       options="{'no_create': True}"/>
+                            </div>
+                        </div>
+                        <group string="Locations" name="locations">
+                            <field name="location_ids" nolabel="1" colspan="2"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="location_plant_view_tree" model="ir.ui.view">
+            <field name="name">location.plant.tree</field>
+            <field name="model">location.plant</field>
+            <field name="arch" type="xml">
+                <tree string="Plant Tree">
+                    <field name="active" invisible="1"/>
+                    <field name="complete_name" string="Location"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="location_ids"/>
+                </tree>
+            </field>
+        </record>
+
+         <record id="action_location_plant_form" model="ir.actions.act_window">
+            <field name="name">Plants</field>
+            <field name="res_model">location.plant</field>
+            <field name="type">ir.actions.act_window</field>
+        </record>
+
+        <menuitem action="action_location_plant_form" id="menu_action_location_plant_form" name="Plant"
+                  parent="menu_plant_and_location" sequence="1"/>
+
+        <record id="view_location_form" model="ir.ui.view">
+            <field name="name">stock.location.form</field>
+            <field name="model">stock.location</field>
+            <field name="arch" type="xml">
+                <form string="Stock Location">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                        </div>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                                attrs="{'invisible': [('active', '=', True)]}"/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                            <div name="code">
+                                <label for="code" class="oe_inline"/>
+                                <field name="code" class="oe_inline oe_input_align" required="1"/>
+                            </div>
+                            <div name="plant_id">
+                                <label for="plant_id" class="oe_inline"/>
+                                [<field name="plant_code" class="oe_inline oe_input_align"/>]
+                                <field name="plant_id" class="oe_inline oe_input_align"
+                                       options="{'no_create': True}"/>
+                            </div>
+                            <div name="location_id">
+                                <label for="location_id" class="oe_inline"/>
+                                <field name="location_id" class="oe_inline oe_input_align"
+                                       options="{'no_create': True}"/>
+                            </div>
+                        </div>
+                        <group>
+                            <group string="Additional Information" name="additional_info">
+                                <field name="active" invisible="1"/>
+                                <field name="usage"/>
+                                <label for="company_id"/>
+                                <div>
+                                    [<field name="company_code" class="oe_inline"/>]
+                                    <field name="company_id" groups="base.group_multi_company" class="oe_inline"
+                                           required="1"
+                                           options="{'no_create': True}"/>
+                                </div>
+
+                                <field name="scrap_location"
+                                       attrs="{'invisible': [('usage', 'not in', ('inventory', 'internal'))]}"/>
+                                <field name="return_location"/>
+                            </group>
+                        </group>
+                        <field name="comment" placeholder="External note..."/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_location_search" model="ir.ui.view">
+            <field name="name">stock.location.search</field>
+            <field name="model">stock.location</field>
+            <field name="arch" type="xml">
+                <search string="Stock Locations">
+                    <field name="complete_name" string="Stock Locations"/>
+                    <filter name="in_location" string="Internal" domain="[('usage', '=', 'internal')]"
+                            help="Internal Locations"/>
+                    <filter name="customer" string="Customer" domain="[('usage', '=', 'customer')]"
+                            help="Customer Locations"/>
+                    <filter name="supplier" string="Vendor" domain="[('usage', '=', 'supplier')]"
+                            help="Vendor Locations"/>
+                    <field name="location_id" string="Parent Location"/>
+                    <separator/>
+                    <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Company" name="group_company" domain="[]" context="{'group_by': 'company_id'}"/>
+                        <filter string="Plant" name="group_plant" domain="[]" context="{'group_by': 'plant_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_location_tree2" model="ir.ui.view">
+            <field name="name">stock.location.tree</field>
+            <field name="model">stock.location</field>
+            <field name="priority" eval="2"/>
+            <field name="arch" type="xml">
+                <tree string="Stock Location" decoration-info="usage=='view'" decoration-danger="usage=='internal'">
+                    <field name="active" invisible="1"/>
+                    <field name="complete_name" string="Location"/>
+                    <field name="plant_id" required="1"/>
+                    <field name="usage"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_location_form" model="ir.actions.act_window">
+            <field name="name">Locations</field>
+            <field name="res_model">stock.location</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_id" ref="view_location_tree2"/>
+            <field name="search_view_id" ref="view_location_search"/>
+            <field name="context">{'search_default_in_location': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add a new location
+                </p><p>
+                Define your locations to reflect your warehouse structure and
+                organization. Odoo is able to manage physical locations
+                (warehouses, shelves, bin, etc), partner locations (customers,
+                vendors) and virtual locations which are the counterpart of
+                the stock operations like the manufacturing orders
+                consumptions, inventories, etc.
+            </p><p>
+                Every stock operation in Odoo moves the products from one
+                location to another one. For instance, if you receive products
+                from a vendor, Odoo will move products from the Vendor
+                location to the Stock location. Each report can be performed on
+                physical, partner or virtual locations.
+            </p>
+            </field>
+        </record>
+
+        <menuitem action="action_location_form" id="menu_action_storage_location_form" name="Location"
+                  parent="menu_plant_and_location" sequence="2"/>
+
+
+    </data>
+</odoo>

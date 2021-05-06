@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="email_template_request_for_quotation" model="mail.template">
+            <field name="name">Purchase - Vendor RFQ Invitation</field>
+            <field name="email_from">${(object.rfq_id.user_id.email and '%s &lt;%s&gt;' % (object.rfq_id.user_id.name, object.rfq_id.user_id.email) or '')|safe}</field>
+            <field name="subject">Request for Quotation Invitation</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="admin_request_for_quotation.model_admin_vendor_rfq"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <p>Dear ${object.partner_id.name},</p>
+                <p>
+                    <br>We would like to request for quotation of the following items:</br>
+                </p>
+                <ul>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Product</th>
+                          <th scope="col">Description</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          % for row in object.rfq_line_ids:
+                            <tr>
+                              <th scope="row">${row.product_id.name}</th>
+                              <td>${row.rfq_line_id.product_description}</td>
+                            </tr>
+                        % endfor
+                      </tbody>
+                    </table>
+
+                </ul>
+                <p>Log in to Vista Home/Bria Connect App to view submission details and the complete list of document
+                    requirements.</p>
+                <p><br/>Thank you.</p>
+            </field>
+        </record>
+
+        <record id="email_template_request_for_quotation_selected_vendor" model="mail.template">
+            <field name="name">Purchase - Vendor RFQ Selected Vendor</field>
+            <field name="email_from">${(object.rfq_id.user_id.email and '%s &lt;%s&gt;' % (object.rfq_id.user_id.name, object.rfq_id.user_id.email) or '')|safe}</field>
+            <field name="subject">Request for Quotation Invitation</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="admin_request_for_quotation.model_admin_vendor_rfq"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <p>Dear ${object.partner_id.name},</p>
+                <p>Congratulation!</p>
+                <p>
+                    <br>You have bee selected as our supplier for the following:</br>
+                </p>
+                <ul>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Product</th>
+                          <th scope="col">Description</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          % for row in object.rfq_line_ids:
+                              % if row.selected == 'selected':
+                                <tr>
+                                  <th scope="row">${row.product_id.name}</th>
+                                  <td>${row.rfq_line_id.product_description}</td>
+                                </tr>
+                              % endif
+                        % endfor
+                      </tbody>
+                    </table>
+
+                </ul>
+                <p>We will soon create a purchase order for you regarding the same.</p>
+                <p>Log in to Vista Home/Bria Connect App to view submission details and the complete list of document
+                    requirements.</p>
+                <p><br/>Thank you.</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

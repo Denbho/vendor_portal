@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+      <record id="bid_purchase_requisition_form" model="ir.ui.view">
+          <field name="name">bid.purchase.requisition.form</field>
+          <field name="model">admin.purchase.requisition</field>
+          <field name="inherit_id" ref="admin_purchase_requisition.admin_purchase_requisition_form"/>
+          <field name="arch" type="xml">
+            <xpath expr="//field[@name='pr_line']/tree/field[@name='internal_order']" position="after">
+              <field name="bid_id" optional="hide"/>
+            </xpath>
+          </field>
+      </record>
+
+      <record id="pr_material_details_form" model="ir.ui.view">
+          <field name="name">pr.material.details.form</field>
+          <field name="model">purchase.requisition.material.details</field>
+          <field name="inherit_id" ref="admin_purchase_requisition.purchase_requisition_material_details_form"/>
+          <field name="arch" type="xml">
+            <field name="product_uom" position="after">
+              <field name="bid_id" readonly="1"/>
+            </field>
+          </field>
+      </record>
+
+      <record id="purchase_requisition_material_details_filter" model="ir.ui.view">
+          <field name="name">purchase.requisition.material.details.search</field>
+          <field name="model">purchase.requisition.material.details</field>
+          <field name="arch" type="xml">
+            <search string="Material Details">
+              <field name="request_id" string="PR #"/>
+              <field name="product_id"/>
+              <group string="Group By">
+                  <filter name="request_id" string="PR #" context="{'group_by':'request_id'}"/>
+                  <filter name="product_id" context="{'group_by':'product_id'}"/>
+              </group>
+            </search>
+          </field>
+      </record>
+
+      <record id="purchase_requisition_material_details_tree" model="ir.ui.view">
+          <field name="name">purchase.requisition.material.details.tree</field>
+          <field name="model">purchase.requisition.material.details</field>
+          <field name="arch" type="xml">
+            <tree string="Material Details">
+              <field name="request_id" string="PR #"/>
+              <field name="product_id"/>
+              <field name="quantity" string="Qty"/>
+              <field name="product_uom" string="UOM"/>
+            </tree>
+          </field>
+      </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem action="purchase.purchase_rfq" id="purchase.menu_purchase_rfq" name="Draft POs"
+                  parent="purchase.menu_procurement_management" sequence="0"/>
+        <menuitem action="purchase.purchase_form_action" id="purchase.menu_purchase_form_action"
+                  parent="purchase.menu_procurement_management" sequence="6" name="Confirmed POs"/>
+
+        <record id="admin_purchase_requisition_form" model="ir.ui.view">
+            <field name="name">admin.purchase.requisition.view.form</field>
+            <field name="model">admin.purchase.requisition</field>
+            <field name="inherit_id" ref="admin_purchase_requisition.admin_purchase_requisition_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='pr_line']/tree/field[@name='rfq_id']" position="after">
+                    <field name="purchase_order_line_ids" widget="many2many_tags" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="purchase_requisition_material_details_form" model="ir.ui.view">
+            <field name="name">purchase.requisition.material.details.view.form</field>
+            <field name="model">purchase.requisition.material.details</field>
+            <field name="inherit_id" ref="admin_purchase_requisition.purchase_requisition_material_details_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='latest_price']" position="after">
+                    <separator string="PO Related" colspan="2"/>
+                    <field name="purchase_order_line_ids" nolabel="1" colspan="2"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="admin_purchase_order_form" model="ir.ui.view">
+            <field name="name">admin.purchase.order.view.form</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button type="action" name="%(action_po_delivery_line_open_form)d" class="oe_stat_button"
+                            icon="fa-truck">
+                        <field name="delivery_count" widget="statinfo" string="DR/GR"/>
+                    </button>
+                    <button type="object" name="action_open_admin_sale_invoice" class="oe_stat_button" icon="fa-tags">
+                        <field name="vendor_si_count" widget="statinfo" string="Sales Invoice"/>
+                    </button>
+                    <button type="object" name="action_open_admin_po_payment" class="oe_stat_button" icon="fa-money">
+                        <field name="vendor_payment_count" widget="statinfo" string="Payment Released"/>
+                    </button>
+                </div>
+                <field name="company_id" position="after">
+                    <field name="sap_delivery_status"/>
+                </field>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="attributes">
+                    <attribute name="string">Ordered Qty</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="after">
+                    <field name="qty_delivered"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="before">
+                    <field name="pr_references" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/group/group/notebook" position="inside">
+                    <page string="Delivery Information">
+                        <field name="delivery_product_line" no_label="1"
+                               widget="one2many_list"
+                               mode="tree">
+                            <tree string="Delivery Information">
+                                <field name="po_delivery_id"/>
+                                <field name="delivery_quantity"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Purchase Requisition">
+                        <group>
+                            <field name="pr_references"/>
+                            <field name="purchase_requisition_line_ids" nolabel="1" colspan="2"
+                                   mode="tree">
+                                <tree string="Material Details" default_order="id">
+                                    <field name="product_id"/>
+                                    <field name="product_categ_id"/>
+                                    <field name="material_description" optional="hide"/>
+                                    <field name="material_code" optional="hide"/>
+                                    <field name="quantity"/>
+                                    <field name="product_uom"/>
+                                    <field name="latest_price" widget="html"/>
+                                    <field name="acct_assignment_categ" optional="hide"/>
+                                    <field name="cost_center_id" optional="hide"/>
+                                    <field name="release_indicator" readonly="1" optional="hide"/>
+                                    <field name="sourcing" optional="hide"/>
+                                    <field name="processing_status" optional="hide"/>
+                                    <field name="requisitioner_id" optional="hide"/>
+                                    <field name="pr_releaser_id" optional="hide"/>
+                                    <field name="purchasing_group_id" optional="hide"/>
+                                    <field name="warehouse_id" optional="hide"/>
+                                    <field name="location" optional="hide"/>
+                                    <field name="unloading_point" optional="hide"/>
+                                    <field name="network" optional="hide"/>
+                                    <field name="asset_code" optional="hide"/>
+                                    <field name="internal_order" optional="hide"/>
+                                    <field name="rfq_id" optional="hide"/>
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="state" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                    <!--                    <page string="Invoices and Payments">-->
+                    <!--                        <field name="si_product_line" no_label="1"-->
+                    <!--                               widget="one2many_list"-->
+                    <!--                               mode="tree">-->
+                    <!--                            <tree string="Invoices and Payments">-->
+                    <!--                                <field name="po_inv_payment_id"/>-->
+                    <!--                                <field name="si_amount"/>-->
+                    <!--                            </tree>-->
+                    <!--                        </field>-->
+                    <!--                    </page>-->
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="purchase_order_line_pivot">
+            <field name="name">purchase.order.line.pivot</field>
+            <field name="model">purchase.order.line</field>
+            <field name="arch" type="xml">
+                <pivot string="Company Allocation">
+                    <field name="company_id" type="row"/>
+                    <field name="order_id" type="row"/>
+                    <field name="product_id" type="row"/>
+                    <field name="product_qty" type="measure"/>
+                    <field name="sap_goods_receipt" type="measure"/>
+                    <field name="price_subtotal" type="measure"/>
+                    <field name="price_tax" type="measure"/>
+                    <field name="price_total" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="po_delivery_line_tree" model="ir.ui.view">
+            <field name="name">po.delivery.line.view.tree</field>
+            <field name="model">po.delivery.line</field>
+            <field name="arch" type="xml">
+                <tree string="Delivery Information Lines">
+                    <field name="po_id"/>
+                    <field name="dr_no"/>
+                    <field name="dr_date"/>
+                    <field name="delivered_by"/>
+                    <field name="received_by"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="po_delivery_line_form" model="ir.ui.view">
+            <field name="name">po.delivery.line.view.form</field>
+            <field name="model">po.delivery.line</field>
+            <field name="arch" type="xml">
+                <form string="Delivery Information Lines">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="po_id"/>
+                                <field name="dr_no"/>
+                                <field name="dr_date"/>
+                                <field name="po_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="delivered_by"/>
+                                <field name="received_by"/>
+                            </group>
+                        </group>
+                        <field name="product_line" no_label="1"
+                               widget="one2many_list"
+                               mode="tree"
+                               context="{'default_po_id': po_id}">
+                            <tree editable="bottom" string="Product Line">
+                                <field name="sequence" widget="handle"/>
+                                <field name="product_line_id" domain="[('order_id','=',po_id)]"
+                                       context="{'show_product_qty': 1}"/>
+                                <field name="name"/>
+                                <field name="delivery_quantity"/>
+                                <field name="po_id" invisible="1"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="po_delivery_line_action" model="ir.actions.act_window">
+            <field name="name">Delivery Information Lines</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">po.delivery.line</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="po_delivery_line_tree"/>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add delivery information.
+                </p>
+            </field>
+        </record>
+
+        <record id="po_invoices_and_payments_tree" model="ir.ui.view">
+            <field name="name">po.invoices.and.payments.view.tree</field>
+            <field name="model">po.invoices.and.payments</field>
+            <field name="arch" type="xml">
+                <tree string="Invoices and Payments Lines">
+                    <field name="po_id"/>
+                    <field name="si_no"/>
+                    <field name="si_date"/>
+                    <field name="si_amount"/>
+                    <field name="edts_ref_no"/>
+                    <field name="amount_released"/>
+                    <field name="or_number"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="po_invoices_and_payments_form" model="ir.ui.view">
+            <field name="name">po.invoices.and.payments.view.form</field>
+            <field name="model">po.invoices.and.payments</field>
+            <field name="arch" type="xml">
+                <form string="Invoices and Payments Lines">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="po_id"/>
+                                <field name="si_no"/>
+                                <field name="edts_ref_no"/>
+                                <field name="or_number"/>
+                                <field name="po_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="si_date"/>
+                                <field name="si_amount"/>
+                                <field name="amount_released"/>
+                            </group>
+                        </group>
+                        <field name="product_line" no_label="1"
+                               widget="one2many_list"
+                               mode="tree"
+                               context="{'default_po_id': po_id}">
+                            <tree editable="bottom" string="Product Line">
+                                <field name="sequence" widget="handle"/>
+                                <field name="product_line_id" domain="[('order_id','=',po_id)]"
+                                       context="{'show_price': 1}"/>
+                                <field name="name"/>
+                                <field name="si_amount"/>
+                                <field name="po_id" invisible="1"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="po_invoices_and_payments_action" model="ir.actions.act_window">
+            <field name="name">Invoices and Payments Lines</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">po.invoices.and.payments</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="po_invoices_and_payments_tree"/>
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add invoices and payments.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_po_delivery_line" parent="purchase.menu_purchase_config" action="po_delivery_line_action"
+                  sequence="6"/>
+        <menuitem id="menu_po_invoices_and_payments" parent="purchase.menu_purchase_config"
+                  action="po_invoices_and_payments_action" sequence="6"/>
+
+    </data>
+</odoo>

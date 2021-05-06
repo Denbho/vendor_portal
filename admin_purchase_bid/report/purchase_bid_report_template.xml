@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="report_bidcom_approval_form">
+    <t t-call="web.external_layout">
+      <div class="page">
+        <style>
+          .bidcom_approval{ font-family: sans-serif; }
+          .bidcom_title{ font-weight: bold; text-align: center; margin-bottom: 50px; }
+          .tbl-bidcom-header tr td{ padding: 5px 20px 5px 0px; }
+          .tbl-bidcom-header tr td:first-child{ font-weight: bold; }
+          .tbl-budget-update,
+          .tbl-bid-comparison{ margin-left: auto; margin-right: auto; border-collapse: collapse; }
+          .tbl-bid-comparison tr td{ border: 1px solid #000; padding: 5px 7px; text-align: center; line-height: 20px;}
+          .txt-bold,
+          .tr-bold td,
+          .tbl-bid-comparison thead tr td{ font-weight: bold; }
+          .tbl-budget-update{ text-align: center; }
+          .tbl-budget-update tr td { padding: 10px 15px; border: 1px solid #000; }
+          .item-border-top{ border-top: 1px solid #000; }
+          .tbl-bid-comparison tbody tr td:first-child{ border-left: 1px solid #000; }
+          .tbl-bid-comparison tbody tr:last-child td:first-child{ border-bottom: 1px solid #000; }
+          .tbl-budget-update tr:first-child td,
+          .item-bold{ font-weight: bold; }
+          .bidcom_approver_border_top{ border-top: 1px solid #000; }
+          .tbl-bs-approver tr td:nth-child(2){ width: 200px; }
+          .p-br-margin{ margin-bottom:0px; }
+          .p-br-margin2{ margin-top:0px; }
+        </style>
+        <div class="bicom_approval">
+          <h3 class="bidcom_title">BID COM APPROVAL FORM</h3>
+          <table class="tbl-bidcom-header">
+            <tr>
+              <td>Date :</td>
+              <td><t t-if="doc.date_selected"><span t-esc="doc.date_selected.strftime('%B %d, %Y')"/></t></td>
+            </tr>
+            <tr>
+              <td>Project Name :</td>
+              <td><span t-field="doc.project_name"/></td>
+            </tr>
+            <tr>
+              <td>Project Address :</td>
+              <td><t t-if="doc.project_location"><span t-field="doc.project_location"/></t></td>
+            </tr>
+            <tr>
+              <td>Description of Work :</td>
+              <td><span t-field="doc.scope_of_work"/></td>
+            </tr>
+            <tr>
+              <td>Budget :</td>
+              <td><b>Php <span t-field="doc.budget" t-options='{"widget": "float", "precision": 2}'/></b></td>
+            </tr>
+          </table>
+          <br/>
+          <h4>I. Bid Comparison</h4>
+          <br/>
+
+
+          <table class="tbl-bid-comparison" >
+            <t t-raw="doc.get_bidders_comparison()" />
+          </table>
+
+          <br/><br/>
+          <h4>II. Budget Update</h4>
+          <br/>
+          <table class="tbl-budget-update">
+            <tr>
+              <td>WBS Element</td>
+              <td>Work Package</td>
+              <td>Available Budget</td>
+              <td>For Award</td>
+            </tr>
+            <tr>
+              <td><span t-field="doc.wbs_element"/></td>
+              <td><span t-field="doc.scope_of_work"/></td>
+              <td>Php <span t-field="doc.budget" t-options='{"widget": "float", "precision": 2}'/></td>
+              <td><b>Php <t t-if="doc.vendor_id"><span t-field="doc.vendor_id.negotiated_amount" t-options='{"widget": "float", "precision": 2}'/></t></b></td>
+            </tr>
+          </table>
+          <br/><br/>
+          <h4>III. Remarks</h4>
+          <br/>
+          <div>
+            <b>BIDCOMM recommends to award the contract to <t t-if="doc.vendor_id"><span t-field="doc.vendor_id.name"/></t>
+            at negotiated amount of <t t-if="doc.vendor_id"><span t-esc="doc.vendor_id.negotiated_amount_in_words"/></t> Pesos Only
+            (Php <t t-if="doc.vendor_id"><span t-field="doc.vendor_id.negotiated_amount" t-options='{"widget": "float", "precision": 2}'/></t>)
+            based on the following:</b>
+          </div>
+          <div t-raw="doc.bid_selection_remarks"/>
+          <br/><br/>
+          <t t-if="doc.bs_verified_by">
+            <p><b>Prepared by:</b></p><br/>
+            <p class="p-br-margin"><b><span t-field="doc.bs_verified_by.name" class="bidcom_approver_border_top"/></b></p>
+            <p class="p-br-margin2" t-if="doc.bs_verified_by.employee_id and doc.bs_verified_by.employee_id.job_id"><span t-field="doc.bs_verified_by.employee_id.job_id.name"/></p>
+          </t>
+          <br/><br/>
+          <t t-if="doc.bs_confirmed_by">
+            <p><b>Approved by:</b></p><br/>
+            <table class="tbl-bs-approver">
+              <tr>
+                <td>
+                  <p class="p-br-margin"><b><span t-field="doc.bs_confirmed_by.name" class="bidcom_approver_border_top"/></b></p>
+                  <p class="p-br-margin2" t-if="doc.bs_confirmed_by.employee_id and doc.bs_confirmed_by.employee_id.job_id"><span t-field="doc.bs_confirmed_by.employee_id.job_id.name"/></p>
+                </td>
+                <td></td>
+                <td>
+                  <t t-if="doc.bs_approved_by">
+                    <p class="p-br-margin"><b><span t-field="doc.bs_approved_by.name" class="bidcom_approver_border_top"/></b></p>
+                    <p class="p-br-margin2" t-if="doc.bs_approved_by.employee_id and doc.bs_approved_by.employee_id.job_id"><span t-field="doc.bs_approved_by.employee_id.job_id.name"/></p>
+                  </t>
+                </td>
+              </tr>
+            </table>
+          </t>
+        </div>
+      </div>
+    </t>
+  </template>
+  <template id="report_bidcom_approval">
+      <t t-call="web.html_container">
+          <t t-foreach="docs" t-as="doc">
+                <t t-call="admin_purchase_bid.report_bidcom_approval_form" />
+          </t>
+      </t>
+  </template>
+</odoo>

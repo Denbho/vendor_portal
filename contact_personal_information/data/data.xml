@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="employment_locally_employed" model="res.partner.employment.status">
+            <field name="name">Locally Employed</field>
+        </record>
+
+        <record id="employment_self_employed" model="res.partner.employment.status">
+            <field name="name">Self-Employed</field>
+        </record>
+
+        <record id="employment_ofw" model="res.partner.employment.status">
+            <field name="name">OFW</field>
+        </record>
+
+        <record id="employment_retiree_pensioner" model="res.partner.employment.status">
+            <field name="name">Retiree/Pensioner</field>
+        </record>
+
+        <record id="employment_with_financiers" model="res.partner.employment.status">
+            <field name="name">With Financiers</field>
+        </record>
+
+        <record id="employment_foreigners" model="res.partner.employment.status">
+            <field name="name">Foreigners</field>
+        </record>
+
+    </data>
+</odoo>

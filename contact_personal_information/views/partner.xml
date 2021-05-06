@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="res_partner_monthly_income_range_view_tree" model="ir.ui.view">
+            <field name="name">res.partner.monthly.income.range.tree</field>
+            <field name="model">res.partner.monthly.income.range</field>
+            <field name="arch" type="xml">
+                <tree string="Income Range" editable="top">
+                    <field name="name"/>
+                    <field name="range_from"/>
+                    <field name="range_to"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="res_partner_monthly_income_range_action_form" model="ir.actions.act_window">
+            <field name="name">Monthly Income Range</field>
+            <field name="res_model">res.partner.monthly.income.range</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="res_partner_monthly_income_range_menu"
+                  action="res_partner_monthly_income_range_action_form" parent="contacts.res_partner_menu_config"
+                  sequence="4"/>
+
+        <record id="res_partner_profession_view_tree" model="ir.ui.view">
+            <field name="name">res.partner.profession.tree</field>
+            <field name="model">res.partner.profession</field>
+            <field name="arch" type="xml">
+                <tree string="profession" editable="top">
+                    <field name="name"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="res_partner_profession_action_form" model="ir.actions.act_window">
+            <field name="name">Profession</field>
+            <field name="res_model">res.partner.profession</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="res_partner_profession_menu"
+                  action="res_partner_profession_action_form" parent="contacts.res_partner_menu_config"
+                  sequence="4"/>
+
+        <record id="res_partnerreligion_iew_tree" model="ir.ui.view">
+            <field name="name">res.partner.religion.tree</field>
+            <field name="model">res.partner.religion</field>
+            <field name="arch" type="xml">
+                <tree string="Religion" editable="top">
+                    <field name="name"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="res_partner_religion_action_form" model="ir.actions.act_window">
+            <field name="name">Religion</field>
+            <field name="res_model">res.partner.religion</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="res_partner_religion_menu"
+                  action="res_partner_religion_action_form" parent="contacts.res_partner_menu_config"
+                  sequence="4"/>
+
+        <record id="res_partner_employment_status_view_tree" model="ir.ui.view">
+            <field name="name">res.partner.employment.status.tree</field>
+            <field name="model">res.partner.employment.status</field>
+            <field name="arch" type="xml">
+                <tree string="Employment Status" editable="top">
+                    <field name="name"/>
+                    <field name="parent_id"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="res_partner_employment_status_action_form" model="ir.actions.act_window">
+            <field name="name">Employment Status</field>
+            <field name="res_model">res.partner.employment.status</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="res_partner_employment_status_menu"
+                  action="res_partner_employment_status_action_form" parent="contacts.res_partner_menu_config"
+                  sequence="4"/>
+
+        <record id="res_partner_age_range_view_tree" model="ir.ui.view">
+            <field name="name">res.partner.age.range.tree</field>
+            <field name="model">res.partner.age.range</field>
+            <field name="arch" type="xml">
+                <tree string="Age Range" editable="top">
+                    <field name="name"/>
+                    <field name="range_from"/>
+                    <field name="range_to"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="res_partner_age_range_action_form" model="ir.actions.act_window">
+            <field name="name">Age Range</field>
+            <field name="res_model">res.partner.age.range</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="res_partner_age_range_menu"
+                  action="res_partner_age_range_action_form" parent="contacts.res_partner_menu_config"
+                  sequence="4"/>
+
+        <record id="view_partner_form" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <field name="phone" position="attributes">
+                    <attribute name="string">Office No.</attribute>
+                </field>
+                <field name="title" position="attributes">
+                    <attribute name="string">Title/Profession</attribute>
+                </field>
+                <notebook position="inside">
+                    <page name="personal" string="Personal Information"
+                          attrs="{'invisible': [('is_company','=', True)]}">
+                        <group col="6">
+                            <group colspan="2">
+                                <field name="nationality_country_id"/>
+                                <field name="religion_id"/>
+                                <field name="gender"/>
+                                <field name="marital"/>
+                            </group>
+                            <group colspan="2">
+                                <field name="date_of_birth"/>
+                                <field name="age" force_save="1" readonly="1"/>
+                                <field name="age_range_id" force_save="1" readonly="1"/>
+                                <field name="employment_status_id"/>
+                                <field name="employment_country_id"/>
+                                <field name="profession_id"/>
+                                <field name="monthly_income"/>
+                                <field name="monthly_income_range_id" readonly="1" force_save="1"/>
+                            </group>
+                            <group colspan="2" name="social_media">
+                                <separator string="Other Contact Info and Links" colspan="2"/>
+                                <field name="mobile2" widget="phone"/>
+                                <field name="social_twitter" widget="url"/>
+                                <field name="social_facebook" widget="url"/>
+                                <field name="social_github" widget="url"/>
+                                <field name="social_linkedin" widget="url"/>
+                                <field name="social_youtube" widget="url"/>
+                                <field name="social_instagram" widget="url"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

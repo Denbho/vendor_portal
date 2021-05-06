@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="email_template_edi_contract" model="mail.template">
+            <field name="name">NOTICE TO PROCEED/LETTER OF AWARD</field>
+            <field name="model_id" ref="admin_contracts_and_agreements.model_contracts_and_agreements"/>
+            <field name="subject">NOTICE TO PROCEED/LETTER OF AWARD (${object.contract_agreement_name})</field>
+            <field name="partner_to"></field>
+            <field name="body_html" type="html">
+              <div style="margin: 0px; padding: 0px; font-size: 16px;">
+                  <p>
+                      <br/>
+                      Dear ${object.partner_id.name},
+                      <br/><br/><br/>
+
+                      In accordance with your proposal, we are pleased to serve in your favor this NOTICE TO PROCEED/LETTER OF AWARD
+                      for the above stated contract package. We hereby instruct you to proceed, effective on ${object.start_date.strftime("%A, %B %d, %Y")}
+                      [four (4) days upon issuance of this notice], with the implementation of the provisions of the Contract,
+                      in accordance with the Terms and Conditions of the Contract Agreement, including its Annexes.
+                      <br/><br/>
+                      Contract Price: <b>Php ${"{:,.2f}".format(object.total_con_agreement_amt)}</b>
+                      <br/><br/><br/><br/>
+                      Thank you very much.
+                  </p>
+              </div>
+            </field>
+            <field name="lang"></field>
+            <field name="user_signature" eval="False"/>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_partner_profession_user,res_partner_profession_user,model_res_partner_profession,base.group_user,1,1,1,1
+access_res_partner_religion_user,res_partner_religion_user,model_res_partner_religion,base.group_user,1,1,1,1
+access_res_partner_employment_status_user,res_partner_employment_status_user,model_res_partner_employment_status,base.group_user,1,1,1,1
+access_res_partner_monthly_income_range_user,res_partner_monthly_income_range_user,model_res_partner_monthly_income_range,base.group_user,1,1,1,1
+access_res_partner_age_user,res_partner_age_range_user,model_res_partner_age_range,base.group_user,1,1,1,1

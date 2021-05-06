@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- Inherit Form view -->
+    <record id="view_partner_form" model="ir.ui.view">
+      <field name="name">res.partner.form</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="arch" type="xml">
+        <div class="o_address_format" position="replace">
+          <div class="o_address_format">
+            <field name="street" placeholder="No. Inc, Bldg Name, Street" class="o_address_street" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <field name="street2" placeholder="Subdivision" class="o_address_street" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <field name="barangay_id" placeholder="Barangay" class="o_address_city" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <field name="city" placeholder="City" class="o_address_city" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}" invisible="1"/>
+            <field name="city_id" placeholder="City" class="o_address_city" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <field name="province_id" placeholder="Province" class="o_address_city" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}" context="{'country_id': country_id, 'zip': zip}"/>
+            <field name="zip" placeholder="ZIP" class="o_address_zip" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <field name="island_group_id" placeholder="Island Group" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" class="o_address_city" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <field name="continent_region_id" placeholder="Continent Region" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <field name="continent_id" placeholder="Continent" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+          </div>
+        </div>
+
+        <xpath expr="//field[@name='child_ids']/form//div[@name='div_address']" position="replace">
+          <div class="o_address_format" name="div_address">
+            <field name="street" placeholder="No. Inc, Bldg Name, Street" class="o_address_street"/>
+            <field name="street2" placeholder="Subdivision" class="o_address_street"/>
+            <field name="barangay_id" placeholder="Barangay" class="o_address_city" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+            <field name="city" placeholder="City" class="o_address_city" invisible="1"/>
+            <field name="city_id" placeholder="City" class="o_address_city" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+            <field name="province_id" placeholder="Province" class="o_address_city" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+            <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" context="{'country_id': country_id, 'zip': zip}"/>
+            <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+            <field name="island_group_id" placeholder="Island Group" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" class="o_address_city"/>
+            <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+            <field name="continent_region_id" placeholder="Continent Region" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+            <field name="continent_id" placeholder="Continent" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+          </div>
+        </xpath>
+      </field>
+    </record>
+
+    <record id="res_continent_view_tree" model="ir.ui.view">
+      <field name="name">res.continent.tree</field>
+      <field name="model">res.continent</field>
+      <field name="arch" type="xml">
+        <tree string="Continent">
+          <field name="name"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="res_continent_view_form" model="ir.ui.view">
+      <field name="name">res.continent.form</field>
+      <field name="model">res.continent</field>
+      <field name="arch" type="xml">
+        <form string="Continent">
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" default_focus="1" placeholder="Continent Name"/>
+              </h1>
+            </div>
+            <group name="region" string="Regions">
+              <field name="continent_region_ids" nolabel="1" colspan="2" readonly="1">
+                <tree string="Continent Region">
+                  <field name="name"/>
+                </tree>
+              </field>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="res_continent_action_form" model="ir.actions.act_window">
+      <field name="name">Continent</field>
+      <field name="res_model">res.continent</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_res_continent"
+        action="res_continent_action_form"
+        parent="contacts.menu_localisation"
+        sequence="1"/>
+
+
+    <record id="res_continent_region_view_tree" model="ir.ui.view">
+      <field name="name">res.continent.region.tree</field>
+      <field name="model">res.continent.region</field>
+      <field name="arch" type="xml">
+        <tree string="Continent Region">
+          <field name="name"/>
+          <field name="continent_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="res_continent_region_view_form" model="ir.ui.view">
+      <field name="name">res.continent_region.form</field>
+      <field name="model">res.continent.region</field>
+      <field name="arch" type="xml">
+        <form string="Continent Region">
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" default_focus="1" placeholder="Continent Region Name"/>
+              </h1>
+            </div>
+            <group>
+              <field name="continent_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+            </group>
+            <group name="countries" string="Countries">
+              <field name="country_ids" nolabel="1" colspan="2" readonly="1">
+                <tree string="Countries">
+                  <field name="name"/>
+                  <field name="code"/>
+                </tree>
+              </field>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="res_continent_region_action_form" model="ir.actions.act_window">
+      <field name="name">Continent Region</field>
+      <field name="res_model">res.continent.region</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_res_continent_region"
+        action="res_continent_region_action_form"
+        parent="contacts.menu_localisation"
+        sequence="2"/>
+
+    <record id="view_country_tree" model="ir.ui.view">
+      <field name="name">res.country.tree</field>
+      <field name="model">res.country</field>
+      <field name="inherit_id" ref="base.view_country_tree"/>
+      <field name="arch" type="xml">
+        <field name="code" position="after">
+          <field name="continent_id"/>
+          <field name="continent_region_id"/>
+        </field>
+      </field>
+    </record>
+
+    <!-- Inherit Form view -->
+    <record id="view_country_form" model="ir.ui.view">
+      <field name="name">res.country.form</field>
+      <field name="model">res.country</field>
+      <field name="inherit_id" ref="base.view_country_form"/>
+      <field name="arch" type="xml">
+        <field name="name" position="replace"/>
+        <group name="main_group" position="before">
+          <div class="oe_title">
+            <h1>
+              <field name="name" default_focus="1" placeholder="Country Name Name"/>
+            </h1>
+          </div>
+          <group>
+            <field name="continent_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+            <field name="continent_region_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+          </group>
+        </group>
+        <group name="main_group" position="after">
+          <group string="Group of Island">
+            <field name="island_ids" nolabel="1" colspan="2" readonly="1">
+              <tree string="Group of Island">
+                <field name="name"/>
+              </tree>
+            </field>
+          </group>
+        </group>
+      </field>
+    </record>
+
+    <menuitem id="contacts.menu_country_partner"
+        action="base.action_country" parent="contacts.menu_localisation"
+        sequence="3"/>
+
+    <record id="res_island_group_view_tree" model="ir.ui.view">
+      <field name="name">res.island.group.tree</field>
+      <field name="model">res.island.group</field>
+      <field name="arch" type="xml">
+        <tree string="Group of Island">
+          <field name="name"/>
+          <field name="continent_id"/>
+          <field name="continent_region_id"/>
+          <field name="country_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="res_island_group_view_form" model="ir.ui.view">
+      <field name="name">res.island.group.form</field>
+      <field name="model">res.island.group</field>
+      <field name="arch" type="xml">
+        <form string="Group of Island">
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" default_focus="1" placeholder="Island Name"/>
+              </h1>
+            </div>
+            <group>
+              <group>
+                <field name="continent_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="continent_region_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+              <group>
+                <field name="country_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+            </group>
+            <group name="region" string="Region/States">
+              <field name="state_ids" nolabel="1" colspan="2" readonly="1">
+                <tree string="Regional/States">
+                  <field name="name"/>
+                </tree>
+              </field>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="res_island_group_action_form" model="ir.actions.act_window">
+      <field name="name">Group of Islands/Lands</field>
+      <field name="res_model">res.island.group</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_res_island_group"
+        action="res_island_group_action_form"
+        parent="contacts.menu_localisation"
+        sequence="4"/>
+
+    <menuitem id="menu_res_region_cluster"
+        parent="contacts.menu_localisation"
+        name="Regional Clusters"
+        sequence="5"/>
+
+    <record id="res_region_cluster_view_tree" model="ir.ui.view">
+      <field name="name">res.region.cluster.tree</field>
+      <field name="model">res.region.cluster</field>
+      <field name="arch" type="xml">
+        <tree string="Regional Cluster">
+          <field name="name"/>
+          <!-- <field name="continent_id"/>
+          <field name="continent_region_id"/>
+          <field name="country_id"/>
+          <field name="island_group_id"/> -->
+        </tree>
+      </field>
+    </record>
+
+    <record id="res_region_cluster_view_form" model="ir.ui.view">
+      <field name="name">res.region.cluster.form</field>
+      <field name="model">res.region.cluster</field>
+      <field name="arch" type="xml">
+        <form string="Regional Cluster">
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" default_focus="1" placeholder="Regional Cluster Name"/>
+              </h1>
+            </div>
+            <!-- <group>
+              <group>
+                <field name="continent_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="continent_region_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+              <group>
+                <field name="country_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="island_group_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+            </group>
+            <group name="cluster2" string="Regional Cluster II">
+              <field name="cluster_ids" nolabel="1" colspan="2" readonly="1">
+                <tree string="Regional Cluster II">
+                  <field name="name"/>
+                </tree>
+              </field>
+            </group> -->
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="res_region_cluster_action_form" model="ir.actions.act_window">
+      <field name="name">Cluster I</field>
+      <field name="res_model">res.region.cluster</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_res_cluster"
+        action="res_region_cluster_action_form"
+        parent="menu_res_region_cluster"
+        sequence="1"/>
+
+    <record id="res_region_cluster2_view_tree" model="ir.ui.view">
+      <field name="name">res.region.cluster2.tree</field>
+      <field name="model">res.region.cluster2</field>
+      <field name="arch" type="xml">
+        <tree string="Regional Cluster II">
+          <field name="name"/>
+          <!-- <field name="continent_id"/>
+          <field name="continent_region_id"/>
+          <field name="country_id"/>
+          <field name="island_group_id"/>
+          <field name="cluster_id"/> -->
+        </tree>
+      </field>
+    </record>
+
+    <record id="res_region_cluster2_view_form" model="ir.ui.view">
+      <field name="name">res.region.cluster2.form</field>
+      <field name="model">res.region.cluster2</field>
+      <field name="arch" type="xml">
+        <form string="Regional Cluster II">
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" default_focus="1" placeholder="Sub-Cluster Name"/>
+              </h1>
+            </div>
+            <!-- <group>
+              <group>
+                <field name="continent_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="continent_region_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+              <group>
+                <field name="country_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="island_group_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="cluster_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+            </group>
+            <group name="regions" string="Regions/States">
+              <field name="states_ids" nolabel="1" colspan="2" readonly="1">
+                <tree string="Region">
+                  <field name="name"/>
+                  <field name="code"/>
+                </tree>
+              </field>
+            </group> -->
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="res_region_cluster2_action_form" model="ir.actions.act_window">
+      <field name="name">Cluster II</field>
+      <field name="res_model">res.region.cluster2</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_res_subcluster"
+        action="res_region_cluster2_action_form"
+        parent="menu_res_region_cluster"
+        sequence="2"/>
+
+    <record id="view_country_state_tree" model="ir.ui.view">
+      <field name="name">res.country.state.tree</field>
+      <field name="model">res.country.state</field>
+      <field name="inherit_id" ref="base.view_country_state_tree"/>
+      <field name="arch" type="xml">
+        <tree position="attributes">
+          <attribute name="editable"/>
+        </tree>
+        <field name="country_id" position="replace">
+          <field name="name"/>
+          <field name="continent_id"/>
+          <field name="continent_region_id"/>
+          <field name="country_id"/>
+          <field name="island_group_id"/>
+          <field name="cluster_id"/>
+          <field name="cluster2_id"/>
+        </field>
+      </field>
+    </record>
+
+    <record id="res_country_state_view_form" model="ir.ui.view">
+      <field name="name">res.country.state.form</field>
+      <field name="model">res.country.state</field>
+      <field name="inherit_id" ref="base.view_country_state_form"/>
+      <field name="arch" type="xml">
+        <form position="replace">
+          <form string="Region/States">
+            <sheet>
+              <div class="oe_title">
+                <h1>
+                  <field name="name" default_focus="1" placeholder="Regional/States Name"/>
+                </h1>
+                <div class="o_row">
+                  <field name="code" placeholder="State Code"/>
+                </div>
+              </div>
+              <group>
+                <group>
+                  <field name="continent_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                  <field name="continent_region_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                  <field name="country_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                </group>
+                <group>
+                  <field name="island_group_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                  <field name="cluster_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                  <field name="cluster2_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                </group>
+              </group>
+              <group name="province" string="Provinces">
+                <field name="province_ids" nolabel="1" colspan="2" readonly="1">
+                  <tree string="Province">
+                    <field name="name"/>
+                  </tree>
+                </field>
+              </group>
+            </sheet>
+          </form>
+        </form>
+      </field>
+    </record>
+
+    <record id="res_country_state_action_form" model="ir.actions.act_window">
+      <field name="name">Region/State</field>
+      <field name="res_model">res.country.state</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="contacts.menu_country_state_partner"
+        action="res_country_state_action_form"
+        parent="contacts.menu_localisation"
+        sequence="6"/>
+
+    <record id="res_country_province_view_tree" model="ir.ui.view">
+      <field name="name">res.country.province.tree</field>
+      <field name="model">res.country.province</field>
+      <field name="arch" type="xml">
+        <tree string="Province">
+          <field name="name"/>
+          <field name="continent_id"/>
+          <field name="continent_region_id"/>
+          <field name="country_id"/>
+          <field name="island_group_id"/>
+          <field name="state_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="res_country_province_view_form" model="ir.ui.view">
+      <field name="name">res.country.province.form</field>
+      <field name="model">res.country.province</field>
+      <field name="arch" type="xml">
+        <form string="Province">
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" default_focus="1" placeholder="Province Name"/>
+              </h1>
+            </div>
+            <group>
+              <group>
+                <field name="continent_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="continent_region_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="country_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+              <group>
+                <field name="island_group_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="state_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+            </group>
+            <group name="cities" string="Cities">
+              <field name="city_ids" nolabel="1" colspan="2" readonly="1">
+                <tree string="City">
+                  <field name="name"/>
+                </tree>
+              </field>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="res_country_province_action_form" model="ir.actions.act_window">
+      <field name="name">Provinces</field>
+      <field name="res_model">res.country.province</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_res_country_province"
+        action="res_country_province_action_form"
+        parent="contacts.menu_localisation"
+        sequence="7"/>
+
+    <record id="res_country_city_view_tree" model="ir.ui.view">
+      <field name="name">res.country.city.tree</field>
+      <field name="model">res.country.city</field>
+      <field name="arch" type="xml">
+        <tree string="City">
+          <field name="name"/>
+          <field name="continent_id"/>
+          <field name="continent_region_id"/>
+          <field name="country_id"/>
+          <field name="island_group_id"/>
+          <field name="state_id"/>
+          <field name="province_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="res_country_city_view_form" model="ir.ui.view">
+      <field name="name">res.country.city.form</field>
+      <field name="model">res.country.city</field>
+      <field name="arch" type="xml">
+        <form string="City">
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" default_focus="1" placeholder="City Name"/>
+              </h1>
+            </div>
+            <group>
+              <group>
+                <field name="continent_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="continent_region_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="country_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="island_group_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+              <group>
+                <field name="state_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="province_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+            </group>
+            <group name="barangays" string="Barangays">
+              <field name="barangay_ids" nolabel="1" colspan="2" readonly="1">
+                <tree string="Barangay">
+                  <field name="name"/>
+                  <field name="zip_code"/>
+                </tree>
+              </field>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="res_country_city_action_form" model="ir.actions.act_window">
+      <field name="name">Cities</field>
+      <field name="res_model">res.country.city</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_res_country_city"
+        action="res_country_city_action_form"
+        parent="contacts.menu_localisation"
+        sequence="8"/>
+
+    <record id="res_barangay_view_tree" model="ir.ui.view">
+      <field name="name">res.barangay.tree</field>
+      <field name="model">res.barangay</field>
+      <field name="arch" type="xml">
+        <tree string="Barangay">
+          <field name="name"/>
+          <field name="zip_code"/>
+          <field name="continent_id"/>
+          <field name="continent_region_id"/>
+          <field name="country_id"/>
+          <field name="island_group_id"/>
+          <field name="state_id"/>
+          <field name="province_id"/>
+          <field name="city_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="res_barangay_view_form" model="ir.ui.view">
+      <field name="name">res.barangay.form</field>
+      <field name="model">res.barangay</field>
+      <field name="arch" type="xml">
+        <form string="Barangay">
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="name" default_focus="1" placeholder="Barangay Name"/>
+              </h1>
+              <div class="o_row">
+                <field name="zip_code" placeholder="Zip Code"/>
+              </div>
+            </div>
+            <group>
+              <group>
+                <field name="continent_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="continent_region_id" required="True" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="country_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="island_group_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+              <group>
+                <field name="state_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="province_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                <field name="city_id" required="1" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+              </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="res_barangay_action_form" model="ir.actions.act_window">
+      <field name="name">Barangays</field>
+      <field name="res_model">res.barangay</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_res_barangay"
+        action="res_barangay_action_form"
+        parent="contacts.menu_localisation"
+        sequence="9"/>
+
+  </data>
+</odoo>

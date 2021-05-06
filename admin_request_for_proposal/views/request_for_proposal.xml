@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="sequence_admin_vendor_rfp" model="ir.sequence">
+            <field name="name">Vendor RFP</field>
+            <field name="code">vendor.request.for.proposal</field>
+            <field name="prefix">RFP</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <menuitem id="admin_request_for_proposal_menu" name="Request For Proposals"
+                  parent="admin_purchase_requisition.menu_admin_purchase_requisition"
+                  sequence="4"/>
+
+        <record id="admin_request_for_proposal_line_view_form" model="ir.ui.view">
+            <field name="name">admin.request.for.proposal.line.form</field>
+            <field name="model">admin.request.for.proposal.line</field>
+            <field name="arch" type="xml">
+                <form string="Vendor Request for product proposal Form" create="false" delete="false">
+                    <header>
+                        <button name="select_as_vendor" string="Select as Vendor" class="oe_highlight" states="draft" type="object"/>
+                        <button name="cancel" string="Cancel" states="draft" type="object"/>
+                        <button string="Set to Done" type="object" states="selected_as_vendor"
+                                name="set_to_done" class="oe_link" icon="fa-check-square"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,selected_as_vendor,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="rfp_id" readonly="1" force_save="1"/>
+                            </h1>
+                        </div>
+                        <group string="Notes">
+                            <field name="notes" nolabel="1" colspan="2" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        </group>
+                        <notebook>
+                            <page name="proposal" string="Proposal">
+                                <field name="proposal_line_ids" widget="section_and_note_one2many" mode="tree"
+                                    attrs="{'readonly': [('state', '!=', 'draft')]}">
+                                    <tree editable="bottom" string="Proposal Line">
+                                        <control>
+                                            <create name="add_product_control" string="Add a Products/Services"/>
+                                            <create name="add_section_control" string="Add a Grouping"
+                                                    context="{'default_display_type': 'line_section'}"/>
+                                            <create name="add_note_control" string="Add a note"
+                                                    context="{'default_display_type': 'line_note'}"/>
+                                        </control>
+                                        <field name="display_type" invisible="1"/>
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="product_name" attrs="{'required': [('display_type', '=', False)]}"/>
+                                        <field name="name" widget="section_and_note_text"
+                                               attrs="{'required': [('display_type', '=', 'line_section')]}"/>
+                                        <field name="delivery_lead_time"/>
+                                        <field name="validity_from" optional="hide"/>
+                                        <field name="validity_to" optional="hide"/>
+                                        <field name="qty"/>
+                                        <field name="unit_name" attrs="{'required': [('display_type', '=', False)]}"/>
+                                        <field name="price"/>
+                                        <field name="total"/>
+                                        <field name="product_id" invisible="1"/>
+                                        <button string="Link to Product" name="%(admin_link_rfp_item_to_product_action_wizard)d"
+                                                class="oe_link" icon="fa-external-link" type="action"
+                                                attrs="{'invisible': ['|', ('product_id', '!=', False), ('parent.state', '!=', 'selected_as_vendor')]}"/>
+                                    </tree>
+                                  <form>
+                                    <header>
+                                      <button string="Link to Product" name="%(admin_link_rfp_item_to_product_action_wizard)d"
+                                              class="oe_link" icon="fa-external-link" type="action"
+                                              attrs="{'invisible': ['|', ('product_id', '!=', False), ('parent.state', '!=', 'selected_as_vendor')]}"/>
+                                    </header>
+                                    <sheet>
+                                      <group>
+                                        <group>
+                                          <field name="product_id" attrs="{'invisible': [('parent.state', 'not in', ['selected_as_vendor','done'])]}"/>
+                                          <field name="product_name"/>
+                                          <field name="name"/>
+                                          <field name="unit_name"/>
+                                        </group>
+                                        <group>
+                                          <field name="price"/>
+                                          <field name="qty"/>
+                                          <field name="total"/>
+                                          <field name="delivery_lead_time"/>
+                                          <label for="validity_from" string="Price Validity"/>
+                                          <div>
+                                              <field name="validity_from" class="oe_inline"/> -
+                                              <field name="validity_to" class="oe_inline"/>
+                                          </div>
+                                        </group>
+                                      </group>
+                                    </sheet>
+                                  </form>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right">
+                                    <div class="oe_subtotal_footer_separator oe_inline">
+                                        <label for="total"/>
+                                    </div>
+                                    <field name="total" nolabel="1" class="oe_subtotal_footer_separator"/>
+                                </group>
+                                <separator string="Payment Terms" colspan="2"/>
+                                <field name="payment_terms" class="oe_inline" placeholder="Define your payment terms ..."
+                                      attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <separator string="Other Terms and Warranty Conditions" colspan="2"/>
+                                <field name="other_term_warranty" class="oe_inline" placeholder="Define your terms and Warranty conditions ..."
+                                      attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <div class="oe_clear"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="admin_request_for_proposal_view_line_tree" model="ir.ui.view">
+            <field name="name">admin.request.for.proposal.line.tree</field>
+            <field name="model">admin.request.for.proposal.line</field>
+            <field name="arch" type="xml">
+                <tree string="Vendor Request for product proposal Tree" create="false" edit="false" delete="false">
+                    <field name="rfp_id"/>
+                    <field name="partner_id"/>
+                    <field name="total"/>
+                    <field name="payment_terms"/>
+                    <field name="other_term_warranty"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="admin_request_for_proposal_lines_pivot">
+            <field name="name">admin.request.for.proposal.line.pivot</field>
+            <field name="model">admin.request.for.proposal.line</field>
+            <field name="arch" type="xml">
+                <pivot string="Bidding Details">
+                    <field name="partner_id" type="row"/>
+                    <field name="total" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="admin_request_for_proposal_lines_action" model="ir.actions.act_window">
+            <field name="name">Vendor RFP Lines</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">admin.request.for.proposal.line</field>
+            <field name="view_mode">tree,form,pivot</field>
+        </record>
+
+        <record id="admin_request_for_proposal_lines_open_action" model="ir.actions.act_window">
+            <field name="name">Vendor RFP Lines</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">admin.request.for.proposal.line</field>
+            <field name="view_mode">tree,form,pivot</field>
+            <field name="domain">[('rfp_id', '=', active_id)]</field>
+        </record>
+
+        <menuitem id="admin_request_for_proposal_line_action_menu" name="RFP Mails"
+                  parent="admin_request_for_proposal_menu" action="admin_request_for_proposal_lines_action"
+                  sequence="2"/>
+
+        <record id="admin_request_for_proposals_view_tree" model="ir.ui.view">
+            <field name="name">admin.request.for.proposals.tree</field>
+            <field name="model">admin.request.for.proposals</field>
+            <field name="arch" type="xml">
+                <tree string="Request for product information Tree">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="create_date"/>
+                    <field name="due_date"/>
+                    <field name="subject"/>
+                    <field name="vendor_ids" widget="many2many_tags"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="admin_request_for_proposals_view_form" model="ir.ui.view">
+            <field name="name">admin.request.for.proposals.form</field>
+            <field name="model">admin.request.for.proposals</field>
+            <field name="arch" type="xml">
+                <form string="Request for product product Form">
+                    <header>
+                        <button name="submit_request" string="Submit"
+                                class="oe_highlight" states="draft" type="object"/>
+                        <button name="confirm_request" string="Confirm"
+                                class="oe_highlight" states="submitted" type="object"/>
+                        <button name="verify_request" string="Verify"
+                                class="oe_highlight" states="confirmed" type="object"/>
+                        <button name="approve_request" string="Approve" help="Final Approval"
+                                class="oe_highlight" states="verified" type="object"/>
+                        <button string="Send RFP" type="object" attrs="{'invisible': ['|', ('sent_rfp', '=', True)]}"
+                                name="send_rfp_email" class="oe_highlight" icon="fa-paper-plane" states="approved"/>
+                        <button string="Set to Done" type="object" attrs="{'invisible': ['|' ,('sent_rfp', '=', False), ('state', '!=', 'approved')]}"
+                                name="set_to_done" class="oe_link" icon="fa-check-square"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                    </header>
+                    <sheet>
+                        <div name="button_box">
+                            <button class="oe_stat_button" type="action" attrs="{'invisible': [('sent_rfp', '=', False)]}"
+                                    name="%(admin_request_for_proposal_lines_open_action)d"
+                                    icon="fa-envelope ">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text"> Vendor RFP Mail</span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1" force_save="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="user_id"/>
+                                <field name="create_date"/>
+                                <field name="sent_rfp" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="est_del_date"/>
+                                <field name="due_date"/>
+                                <field name="vendor_ids" widget="many2many_tags" attrs="{'invisible': [('sent_rfp', '=', True)]}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Email Content" name="email_content">
+                                <label for="subject"/>
+                                <h2 style="display: inline-block;"><field name="subject" placeholder="Subject (placeholders may be used here)"/></h2>
+                                <field name="body_html" widget="html" options="{'style-inline': true}"/>
+                                <field name="attachment_ids" widget="many2many_binary"/>
+                            </page>
+                            <page name="pr" string="Material/Service PR Related">
+                                <field name="pr_related_ids" no_label="1"
+                                       attrs="{'readonly': [('state', 'not in', ['draft'])]}">
+                                    <tree string="PR Related" edit="false">
+                                        <field name="request_id" string="PR #"/>
+                                        <field name="product_id"/>
+                                        <field name="quantity" string="Qty"/>
+                                        <field name="product_uom" string="UOM"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page name="Approvals" string="Approvals" states="submitted,confirmed,verified,approved1,approved2,approved">
+                                <group>
+                                    <group>
+                                        <label for="submitted_by" states="submitted,confirmed,verified,approved1,approved2,approved"/>
+                                        <div states="submitted,confirmed,verified,approved1,approved2,approved">
+                                            <field name="submitted_by" class="oe_inline"/>
+                                            <field name="submitted_date" class="oe_inline"/>
+                                        </div>
+                                        <label for="confirmed_by" states="confirmed,verified,approved1,approved2,approved"/>
+                                        <div states="confirmed,verified,approved1,approved2,approved">
+                                            <field name="confirmed_by" class="oe_inline"/>
+                                            <field name="confirmed_date" class="oe_inline"/>
+                                        </div>
+                                        <label for="verified_by" states="verified,approved1,approved2,approved"/>
+                                        <div states="verified,approved1,approved2,approved">
+                                            <field name="verified_by" class="oe_inline"/>
+                                            <field name="verified_date" class="oe_inline"/>
+                                        </div>
+                                    </group>
+                                    <group>
+                                        <label for="approved_by" string="Approved (Final)" states="approved"/>
+                                        <div states="approved">
+                                            <field name="approved_by" class="oe_inline"/>
+                                            <field name="approved_date" class="oe_inline"/>
+                                        </div>
+                                        <label for="canceled_by" states="canceled"/>
+                                        <div states="canceled">
+                                            <field name="canceled_by" class="oe_inline"/>
+                                            <field name="canceled_date" class="oe_inline"/>
+                                        </div>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="admin_request_for_proposal_action" model="ir.actions.act_window">
+            <field name="name">Request For Proposal Details</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">admin.request.for.proposals</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="admin_request_for_proposal_action_menu" name="RFP Details"
+                  parent="admin_request_for_proposal_menu" action="admin_request_for_proposal_action"
+                  sequence="1"/>
+
+    </data>
+</odoo>

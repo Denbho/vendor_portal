@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+      <record id="contracts_and_agreements_form" model="ir.ui.view">
+          <field name="name">contracts.and.agreements.view.form</field>
+          <field name="model">contracts.and.agreements</field>
+          <field name="inherit_id" ref="admin_contracts_and_agreements.contracts_and_agreements_form"/>
+          <field name="arch" type="xml">
+            <field name="ref_no" position="after">
+              <field name="bid_id" readonly="1"/>
+            </field>
+          </field>
+      </record>
+
+      <record id="view_create_contract_agreement_wizard" model="ir.ui.view">
+        <field name="name">create.contract.agreement.wizard.view</field>
+        <field name="model">create.contract.agreement</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+          <form>
+            <group>
+              <field name="inclusion_line" no_label="1" widget="one2many" mode="tree">
+                <tree string="Inclusion Lines" editable="bottom">
+                  <field name="product_id"/>
+                  <field name="quantity"/>
+                  <field name="price"/>
+                </tree>
+              </field>
+            </group>
+            <footer>
+               <button name="create_contract_agreement" string="Create a Contract/Agreement" type="object" class="oe_highlight"/>
+               <button string="Cancel" class="btn btn-default" special="cancel"/>
+            </footer>
+          </form>
+        </field>
+      </record>
+
+    </data>
+</odoo>

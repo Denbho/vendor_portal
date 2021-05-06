@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_continent_user,res_continent_user,model_res_continent,base.group_user,1,1,1,1
+access_res_continent_region_user,res_continent_region_user,model_res_continent_region,base.group_user,1,1,1,1
+access_res_island_groupt_user,res_island_group_user,model_res_island_group,base.group_user,1,1,1,1
+access_region_cluster_user,region_cluster_user,model_res_region_cluster,base.group_user,1,1,1,1
+access_region_cluster2_user,region_cluster2_user,model_res_region_cluster2,base.group_user,1,1,1,1
+access_res_country_province_user,res_country_province_user,model_res_country_province,base.group_user,1,1,1,1
+access_res_country_city_user,res_country_city_user,model_res_country_city,base.group_user,1,1,1,1
+access_res_barangay_user,res_barangay_user,model_res_barangay,base.group_user,1,1,1,1

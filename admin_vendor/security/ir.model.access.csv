@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_service_offered,product_service_offered,model_product_service_offered,,1,1,1,1
+access_partner_evaluation,partner_evaluation,model_partner_evaluation,,1,1,1,1
+access_partner_evaluation_line,partner_evaluation_line,model_partner_evaluation_line,,1,1,1,1
+access_partner_evaluator,partner_evaluator,model_partner_evaluator,,1,1,1,1
+access_partner_evaluator_line,partner_evaluator_line,model_partner_evaluator_line,,1,1,1,1
+access_res_partner_affiliation,res_partner_affiliation,model_res_partner_affiliation,,1,1,1,1

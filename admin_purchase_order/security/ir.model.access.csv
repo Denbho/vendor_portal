@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_po_delivery_line,po_delivery_line,model_po_delivery_line,,1,1,1,1
+access_po_invoices_and_payments,po_invoices_and_payments,model_po_invoices_and_payments,,1,1,1,1
+access_po_delivery_product_line,po_delivery_product_line,model_po_delivery_product_line,,1,1,1,1
+access_po_invoices_and_payments_product_line,po_invoices_and_payments_product_line,model_po_invoices_and_payments_product_line,,1,1,1,1
+access_admin_invoice_payment,admin_invoice_payment,model_admin_invoice_payment,,1,1,1,1
+access_admin_sales_invoice,admin_sales_invoice,model_admin_sales_invoice,,1,1,1,1
