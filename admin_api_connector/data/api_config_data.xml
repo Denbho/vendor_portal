@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="admin_api_key_config_data" model="admin.api.key.config">
+            <field name="api_content_type">application/json</field>
+        </record>
+
+    </data>
+</odoo>

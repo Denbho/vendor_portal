@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_bid,purchase_bid,model_purchase_bid,,1,1,1,1
+access_purchase_bid_vendor,purchase_bid_vendor,model_purchase_bid_vendor,,1,1,1,1
+access_vendor_evaluation_line,vendor_evaluation_line,model_vendor_evaluation_line,,1,1,1,1
+access_vendor_evaluation_template,vendor_evaluation_template,model_vendor_evaluation_template,,1,1,1,1
+access_vendor_evaluator,vendor_evaluator,model_vendor_evaluator,,1,1,1,1
+access_vendor_evaluator_line,vendor_evaluator_line,model_vendor_evaluator_line,,1,1,1,1
+access_evaluation_criteria,evaluation_criteria,model_evaluation_criteria,,1,1,1,1
+access_bid_summary_line,bid_summary_line,model_bid_summary_line,,1,1,1,1
+access_terms_of_payment_line,terms_of_payment_line,model_terms_of_payment_line,,1,1,1,1
+access_document_requirement,document_requirement,model_document_requirement,,1,1,1,1
+access_assigned_evaluator_line,assigned_evaluator_line,model_assigned_evaluator_line,,1,1,1,1

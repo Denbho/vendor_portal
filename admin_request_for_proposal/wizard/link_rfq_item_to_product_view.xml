@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="admin_link_rfp_item_to_product_form" model="ir.ui.view">
+            <field name="name">admin.link.rfp.item.to.product.form</field>
+            <field name="model">admin.link.rfp.item.to.product</field>
+            <field name="arch" type="xml">
+                <form string="Link RFP Item to Product">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="rfp_product_line_id" invisible="1"/>
+                                <field name="product_id" context="{'default_name': product_name, 'default_description_purchase': name, 'default_standard_price': price}"/>
+                                <field name="product_name"/>
+                                <field name="name"/>
+                                <field name="unit_name"/>
+                            </group>
+                            <group>
+                              <field name="price"/>
+                              <field name="qty"/>
+                              <field name="total"/>
+                              <field name="delivery_lead_time"/>
+                              <label for="validity_from" string="Price Validity"/>
+                              <div>
+                                  <field name="validity_from" class="oe_inline"/> -
+                                  <field name="validity_to" class="oe_inline"/>
+                              </div>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Link to Product" type="object"
+                                name="link_to_product" class="oe_highlight"/>
+                        <button string="Cancel" class='oe_link' special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="admin_link_rfp_item_to_product_action_wizard" model="ir.actions.act_window">
+            <field name="name">Link RFP Item to Product</field>
+            <field name="res_model">admin.link.rfp.item.to.product</field>
+            <field name="view_mode">form</field>
+            <field name="context">{'default_rfp_product_line_id': active_id}</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

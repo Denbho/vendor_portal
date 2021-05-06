@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+      <record id="admin_request_for_quotation_view_form" model="ir.ui.view">
+          <field name="name">admin.request.for.quotation.form</field>
+          <field name="model">admin.request.for.quotation</field>
+          <field name="inherit_id" ref="admin_request_for_quotation.admin_request_for_quotation_view_form"/>
+          <field name="arch" type="xml">
+            <xpath expr="//field[@name='rfq_line_ids']/form/notebook/page/field[@name='quantity_company_ids']/tree/field[@name='company_id']" position="before">
+                <field name="pr_id"/>
+            </xpath>
+          </field>
+      </record>
+
+    </data>
+</odoo>

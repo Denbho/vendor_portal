@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_admin_request_for_proposals_all,admin_request_for_proposals_all,model_admin_request_for_proposals,,1,1,1,1
+access_admin_request_for_proposal_line_all,admin_request_for_proposal_line_all,model_admin_request_for_proposal_line,,1,1,1,1
+access_admin_request_for_proposal_line_product_all,admin_request_for_proposal_line_product_all,model_admin_request_for_proposal_line_product,,1,1,1,1

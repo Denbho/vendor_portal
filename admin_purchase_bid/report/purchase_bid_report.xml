@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+      <report
+          id="action_report_bidcom_approval"
+          string="Bidcom Approval Form"
+          model="purchase.bid"
+          report_type="qweb-pdf"
+          file="admin_purchase_bid.report_bidcom_approval"
+          name="admin_purchase_bid.report_bidcom_approval"
+          print_report_name="'BID COM APPROVAL FORM - %s' % (object.name)"
+          menu="False"
+      />
+    </data>
+</odoo>

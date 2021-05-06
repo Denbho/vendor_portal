@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="admin_select_vendor_rfq_view_form" model="ir.ui.view">
+            <field name="name">admin.select.vendor.rfq.form</field>
+            <field name="model">admin.select.vendor.rfq</field>
+            <field name="arch" type="xml">
+                <form string="Select Vendor RFQ Form">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="rfq_vendor_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="rfq_vendor_id" force_save="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="rfq_line_id"/>
+                                <field name="product_id"/>
+                                <label for="prod_qty"/>
+                                <div>
+                                    <field name="prod_qty"/>
+                                    <field name="product_uom"/>
+                                </div>
+                                <field name="product_description"/>
+                            </group>
+                            <group>
+                                <field name="price"/>
+                                <field name="sub_total_price"/>
+                                <field name="delivery_cost"/>
+                                <field name="gross_total"/>
+                                <field name="minimum_order_qty"/>
+                                <field name="delivery_lead_time"/>
+                                <label for="validity_from" string="Price Validity"/>
+                                <div>
+                                    <field name="validity_from" class="oe_inline"/> -
+                                    <field name="validity_to" class="oe_inline"/>
+                                </div>
+                            </group>
+                        </group>
+                        <group>
+                            <separator string="Warranty"/>
+                            <field name="warranty" colspan="2" nolabel="1"/>
+                            <separator string="Terms"/>
+                            <field name="terms" colspan="2" nolabel="1"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Select Vendor" type="object"
+                                name="select_vendor" class="oe_highlight"/>
+                        <button string="Cancel" class='oe_link' special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="admin_select_vendor_rfq_action_wizard" model="ir.actions.act_window">
+            <field name="name">Select Vendor</field>
+            <field name="res_model">admin.select.vendor.rfq</field>
+            <field name="view_mode">form</field>
+            <field name="context">{'default_rfq_line_id': active_id}</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

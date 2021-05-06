@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="property_ledger_payment_item_view_tree" model="ir.ui.view">
+            <field name="name">property.ledger.payment.item.tree</field>
+            <field name="model">property.ledger.payment.item</field>
+            <field name="inherit_id" ref="property_admin_monitoring.property_ledger_payment_item_view_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='line_counter']" position="after">
+                    <field name="sap_datetime_sync" optional="hide"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="property_sale_statement_of_account_view_tree" model="ir.ui.view">
+            <field name="name">property.sale.statement.of.account.tree</field>
+            <field name="model">property.sale.statement.of.account</field>
+            <field name="inherit_id" ref="property_admin_monitoring.property_sale_statement_of_account_view_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='soa_number']" position="after">
+                    <field name="sap_datetime_sync" optional="hide"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="property_detail_view_tree" model="ir.ui.view">
+            <field name="name">property.detail.tree</field>
+            <field name="model">property.detail</field>
+            <field name="inherit_id" ref="property_admin_monitoring.property_detail_view_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="sap_datetime_sync" optional="hide"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="property_subdivision_phase_view_tree" model="ir.ui.view">
+            <field name="name">property.subdivision.phase.tree</field>
+            <field name="model">property.subdivision.phase</field>
+            <field name="inherit_id" ref="property_admin_monitoring.property_subdivision_phase_view_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="sap_datetime_sync" optional="hide"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="housing_model_view_tree" model="ir.ui.view">
+            <field name="name">housing.model.tree</field>
+            <field name="model">housing.model</field>
+            <field name="inherit_id" ref="property_admin_monitoring.housing_model_view_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="sap_datetime_sync" optional="hide"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="property_admin_sale_view_tree_tree" model="ir.ui.view">
+            <field name="name">property.admin.sale.tree</field>
+            <field name="model">property.admin.sale</field>
+            <field name="inherit_id" ref="property_admin_monitoring.property_admin_sale_view_tree"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="sap_datetime_sync" optional="hide"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="view_company_tree" model="ir.ui.view">
+            <field name="name">res.company.tree</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_tree"/>
+            <field name="arch" type="xml">
+                <field name="name" position="before">
+                    <field name="sap_client_id"/>
+                    <field name="sap_datetime_sync" optional="hide"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_partner_tree" model="ir.ui.view">
+            <field name="name">res.partner.tree</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <field name="display_name" position="before">
+                    <field name="sap_datetime_sync" optional="hide"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>

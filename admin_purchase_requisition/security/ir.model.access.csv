@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_admin_purchase_requisition,admin_purchase_requisition,model_admin_purchase_requisition,,1,1,1,1
+access_admin_stock_location,admin_stock_location,model_stock_location,,1,1,1,1
+access_admin_location_plant,admin_location_plant,model_location_plant,,1,1,1,1
+access_purchase_requisition_material_details,purchase_requisition_material_details,model_purchase_requisition_material_details,,1,1,1,1
+access_acct_assignment_category,acct_assignment_category,model_acct_assignment_category,,1,1,1,1
+access_purchase_requisitioner,purchase_requisitioner,model_purchase_requisitioner,,1,1,1,1
+access_purchasing_group,purchasing_group,model_purchasing_group,,1,1,1,1
+access_pr_document_type,pr_document_type,model_pr_document_type,,1,1,1,1

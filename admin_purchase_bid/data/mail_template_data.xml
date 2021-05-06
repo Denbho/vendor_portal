@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="email_template_edi_bid" model="mail.template">
+            <field name="name">Send Invitation to Bid</field>
+            <field name="model_id" ref="admin_purchase_bid.model_purchase_bid_vendor"/>
+            <field name="subject">INVITATION TO BID</field>
+            <field name="partner_to"></field>
+            <field name="body_html" type="html">
+              <div style="margin: 0px; padding: 0px; font-size: 16px;">
+                  <p>
+                      <br/>
+                      Dear ${object.contact_id and object.contact_id.name or object.partner_id.name},
+                      <br/><br/><br/>
+                      You are invited to participate in bidding created by ${object.bid_id.create_uid.name} Project/s.
+                      Details of the bidding will be discussed during the pre-bid conference to be held via [Meeting Channel]
+                      on [Pre-bid Meeting Date/Time].
+                      <br/><br/>
+                      Please confirm your attendance on or before [2 days before Pre-bid Meeting Date/Time]
+                      by clicking the link below:
+                      <br/><br/>
+                      [Confirm Participation]
+                      <br/><br/>
+                      If you have any queries, you may email us at procurement.sourcing@camella.com.ph or
+                      contact any of the following persons:
+                      <br/><br/>
+                      ${object.bid_id.create_uid.name}<br/>
+                      % if object.bid_id.create_uid.phone:
+                          Phone: ${object.bid_id.create_uid.phone}<br/>
+                      % endif
+                      % if object.bid_id.create_uid.mobile:
+                          Mobile: ${object.bid_id.create_uid.mobile}<br/>
+                      % endif
+                      % if object.bid_id.create_uid.email:
+                          Email: ${object.bid_id.create_uid.email}<br/>
+                      % endif
+                      <br/>
+                      ${object.bid_id.approved_by.name}<br/>
+                      % if object.bid_id.approved_by.phone:
+                          Phone: ${object.bid_id.approved_by.phone}<br/>
+                      % endif
+                      % if object.bid_id.approved_by.mobile:
+                          Mobile: ${object.bid_id.approved_by.mobile}<br/>
+                      % endif
+                      % if object.bid_id.approved_by.email:
+                          Email: ${object.bid_id.approved_by.email}<br/>
+                      % endif
+                      <br/><br/><br/>
+                      Regards,
+                      <br/>
+                      ${object.bid_id.create_uid.company_id.name}<br/>
+                  </p>
+              </div>
+            </field>
+            <field name="lang"></field>
+            <field name="user_signature" eval="False"/>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>
