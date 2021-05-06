@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="property_sale_statement_of_account_view_tree" model="ir.ui.view">
+            <field name="name">property.sale.statement.of.account.view.tree</field>
+            <field name="model">property.sale.statement.of.account</field>
+            <field name="arch" type="xml">
+                <tree string="Statement of Account Tree">
+                    <field name="soa_number"/>
+                    <field name="so_number" optional="hide"/>
+                    <field name="property_sale_id"/>
+                    <field name="partner_id"/>
+                    <field name="customer_number" optional="hide"/>
+                    <field name="company_id" filter_domain="['|',('company_code', 'ilike', self)]"/>
+                    <field name="company_code" optional="hide"/>
+                    <field name="be_code"/>
+                    <field name="su_number" optional="hide"/>
+                    <field name="block_lot"/>
+                    <field name="date_generated" optional="hide"/>
+                    <field name="soa_date"/>
+                    <field name="soa_month" optional="hide"/>
+                    <field name="soa_year" optional="hide"/>
+                    <field name="soa_due_date"/>
+                    <field name="current_amount"/>
+                    <field name="penalty"/>
+                    <field name="past_due"/>
+                    <field name="total_amount_due"/>
+                    <field name="accrued_interest" optional="hide"/>
+                    <field name="unpaid_months" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_property_sale_statement_of_account_view_form" model="ir.ui.view">
+            <field name="name">property.sale.statement.of.account.view.form</field>
+            <field name="model">property.sale.statement.of.account</field>
+            <field name="arch" type="xml">
+                <form string="Statement of Account">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="soa_number" class="oe_edit_only" string="SOA Reference"/>
+                            <h1>
+                                <field name="soa_number"/>
+                            </h1>
+                            <div name="so_number">
+                                <label for="so_number" class="oe_inline"/>
+                                <field name="so_number" class="oe_inline oe_input_align"/>
+                            </div>
+                            <div name="property_id">
+                                <label for="property_id" class="oe_inline"/>
+                                <field name="property_id" class="oe_inline oe_input_align"/>
+                            </div>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="customer_number"/>
+                                <field name="partner_id"/>
+                                <field name="company_code"/>
+                                <field name="company_id" groups="base.group_multi_company" invisible="1"/>
+                                <field name="be_code"/>
+                                <field name="block_lot" invisible="1"/>
+                                <field name="su_number" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="date_generated"/>
+                                <field name="soa_date"/>
+                                <field name="soa_due_date"/>
+                                <field name="current_amount"/>
+                                <field name="past_due"/>
+                                <field name="penalty"/>
+                                <field name="total_amount_due"/>
+                                <field name="accrued_interest"/>
+                                <field name="unpaid_months"/>
+                                <field name="past_due_count"/>
+                            </group>
+                        </group>
+                        <field name="past_due_line_ids" colspan="2">
+                            <tree string="Due lines" editable="top">
+                                <field name="soa_number" invisible="1"/>
+                                <field name="bill_number"/>
+                                <field name="bill_date"/>
+                                <field name="billing_amount"/>
+                                <field name="penalty"/>
+                                <field name="amount_due" sum="Total"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_property_sale_statement_of_account_filter" model="ir.ui.view">
+            <field name="name">property.sale.statement.of.account.search</field>
+            <field name="model">property.sale.statement.of.account</field>
+            <field name="arch" type="xml">
+                <search string="Statement of Account">
+                    <field name="company_id"
+                           filter_domain="['|', ('company_id', 'ilike', self), ('company_code', 'ilike', self)]"/>
+                    <field name="partner_id"
+                           filter_domain="['|', ('partner_id', 'ilike', self), ('customer_number', 'ilike', self)]"/>
+                    <field name="so_number"
+                           filter_domain="['|', ('so_number', 'ilike', self), ('so_assign_number', 'ilike', self)]"/>
+                    <field name="soa_number"/>
+                    <field name="be_code"/>
+                    <field name="su_number"/>
+                    <field name="block_lot"/>
+                    <field name="date_generated"/>
+                    <field name="soa_date"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_company_id" string="Company" domain="[]"
+                                context="{'group_by': 'company_id'}"/>
+                        <filter name="group_partner_id" string="Customer" domain="[]"
+                                context="{'group_by': 'partner_id'}"/>
+                        <filter name="group_so_number" string="Sales Document" domain="[]"
+                                context="{'group_by': 'so_number'}"/>
+                        <filter name="group_be_code" string="BE Code" domain="[]"
+                                context="{'group_by': 'be_code'}"/>
+                        <filter name="group_block_lot" string="Unit" domain="[]"
+                                context="{'group_by': 'block_lot'}"/>
+                        <filter name="group_soa_date" string="SOA Date" domain="[]"
+                                context="{'group_by': 'soa_date'}"/>
+                        <filter name="group_soa_year" string="SOA Year" domain="[]"
+                                context="{'group_by': 'soa_year'}"/>
+                        <filter name="group_soa_month" string="SOA Month" domain="[]"
+                                context="{'group_by': 'soa_month'}"/>
+                    </group>
+                    <searchpanel>
+                        <field name="company_id" icon="fa-tags"/>
+                    </searchpanel>
+                </search>
+            </field>
+        </record>
+
+        <record id="property_sale_statement_of_account_action_form" model="ir.actions.act_window">
+            <field name="name">Statement Of Accounts</field>
+            <field name="res_model">property.sale.statement.of.account</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_property_sale_statement_of_account" parent="menu_property_sale_monitoring"
+                  action="property_sale_statement_of_account_action_form" sequence="2"/>
+
+        <record id="property_ledger_payment_item_view_tree" model="ir.ui.view">
+            <field name="name">property.ledger.payment.item.tree</field>
+            <field name="model">property.ledger.payment.item</field>
+            <field name="arch" type="xml">
+                <tree string="Payment Line Tree" editable="top">
+                    <field name="line_counter" widget="handle"/>
+                    <field name="so_number"/>
+                    <field name="company_id" filter_domain="['|',('company_code', 'ilike', self)]"/>
+                    <field name="company_code" optional="show"/>
+                    <field name="partner_id"/>
+                    <field name="customer_number" optional="show"/>
+                    <field name="property_sale_id"/>
+                    <field name="so_assign_number" optional="hide"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="billing_number" optional="hide"/>
+                    <field name="accounting_date"/>
+                    <field name="billing_date" optional="hide"/>
+                    <field name="posting_date" optional="hide"/>
+                    <field name="fiscal_year" optional="hide"/>
+                    <field name="document_type" optional="hide"/>
+                    <field name="billing_type" optional="hide"/>
+                    <field name="billing_amount" optional="hide"/>
+                    <field name="billing_due_date" optional="hide"/>
+                    <field name="or_number"/>
+                    <field name="payment_document_number" optional="hide"/>
+                    <field name="transaction_description" optional="hide"/>
+                    <field name="payment_amount"/>
+                    <field name="bank_notes" optional="hide"/>
+                    <field name="customer_notes" optional="hide"/>
+                    <field name="payment_posting_date" optional="hide"/>
+                    <field name="reference_document_number" optional="hide"/>
+                    <field name="reference_number" optional="hide"/>
+                    <field name="reference_count" optional="hide"/>
+                    <field name="clearing_document_ref" optional="show"/>
+                    <field name="clearing_date" optional="show"/>
+                    <field name="allocated_to_requirement" optional="hide"/>
+                    <field name="line_tagging" optional="hide"/>
+                    <field name="principal_amount"/>
+                    <field name="interest_amount"/>
+                    <field name="sundry_amount"/>
+                    <field name="total_amount"/>
+                    <field name="amount_in_local_currency" optional="hide"/>
+                    <field name="recap_amount" optional="hide"/>
+                    <field name="restructure_amount" optional="hide"/>
+                    <field name="unpaid_amount" optional="hide"/>
+                    <field name="running_bal" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_property_ledger_payment_item_filter" model="ir.ui.view">
+            <field name="name">property.ledger.payment.item.search</field>
+            <field name="model">property.ledger.payment.item</field>
+            <field name="arch" type="xml">
+                <search string="Property Sales">
+                    <field name="company_id"
+                           filter_domain="['|', ('company_id', 'ilike', self), ('company_code', 'ilike', self)]"/>
+                    <field name="partner_id"
+                           filter_domain="['|', ('partner_id', 'ilike', self), ('customer_number', 'ilike', self)]"/>
+                    <field name="so_number"
+                           filter_domain="['|', ('so_number', 'ilike', self), ('so_assign_number', 'ilike', self)]"/>
+                    <field name="or_number"/>
+                    <field name="payment_document_number"/>
+                    <field name="transaction_description"/>
+                    <field name="payment_amount"/>
+                    <field name="customer_notes"/>
+                    <field name="reference_document_number"/>
+                    <field name="reference_number"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_fiscal_year" string="Fiscal Year" domain="[]"
+                                context="{'group_by': 'fiscal_year'}"/>
+                        <filter name="group_partner_id" string="Customer" domain="[]"
+                                context="{'group_by': 'partner_id'}"/>
+                        <filter name="group_company_id" string="Company" domain="[]"
+                                context="{'group_by': 'company_id'}"/>
+                        <filter name="group_so_number" string="Sales Document" domain="[]"
+                                context="{'group_by': 'so_number'}"/>
+                    </group>
+                    <searchpanel>
+                        <field name="company_id" icon="fa-tags"/>
+                    </searchpanel>
+                </search>
+            </field>
+        </record>
+
+        <record id="property_ledger_payment_item_action_form" model="ir.actions.act_window">
+            <field name="name">Payments</field>
+            <field name="res_model">property.ledger.payment.item</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_assigned_me': 1}</field>
+        </record>
+
+        <menuitem id="menu_property_ledger_payment_item" parent="menu_property_sale_monitoring"
+                  action="property_ledger_payment_item_action_form" sequence="3"/>
+
+    </data>
+</odoo>

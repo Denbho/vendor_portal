@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="property_document_submission_view_form" model="ir.ui.view">
+            <field name="name">property.document.submission.form</field>
+            <field name="model">property.document.submission</field>
+            <field name="arch" type="xml">
+                <form string="Validate Submitted Document">
+                    <sheet>
+                        <field name="line_ids" colspan="2">
+                            <tree string="Documents" editable="top">
+                                <field name="document_id"/>
+                                <field name="validation_date"/>
+                                <field name="expiry_date"/>
+                                <field name="note"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                    <footer>
+                        <button string="Confirm" type="object" name="set_account_for_cancellation" class="oe_highlight"/>
+                        <button string="Cancel" class='oe_link' special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    
+    </data>
+</odoo>

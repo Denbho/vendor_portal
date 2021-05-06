@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="helpdesk_team_view_form" model="ir.ui.view">
+            <field name="name">helpdesk.team.form</field>
+            <field name="model">helpdesk.team</field>
+            <field name="inherit_id" ref="helpdesk.helpdesk_team_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@id='productivity']" position="inside">
+                    <div class="col-lg-6 o_setting_box"
+                         title="This Team are assigned to handle all issue and queries related to defined project">
+                        <div class="o_setting_right_pane">
+                            <label for="project_subdivision_ids"/>
+                            <div class="text-muted">
+                                What Projects are this team assigned to handle issue and queries
+                            </div>
+                            <div>
+                                <field name="project_subdivision_ids" class="mt16 o_light_label" widget="many2many_tags"/>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="helpdesk_ticket_view_form" model="ir.ui.view">
+            <field name="name">helpdesk.ticket.form</field>
+            <field name="model">helpdesk.ticket</field>
+            <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="before">
+                    <field name="so_number"/>
+                    <field name="property_sale_id"/>
+                    <field name="be_code"/>
+                    <field name="project_subdivision_id"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('property_sale_id', 'not in', [False])]}</attribute>
+                    <attribute name="force_save">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_name']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('property_sale_id', 'not in', [False])], 'invisible': [('partner_id', '!=', False)]}</attribute>
+                    <attribute name="force_save">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_email']" position="attributes">
+                    <attribute name="attrs">{'readonly': [('property_sale_id', 'not in', [False])]}</attribute>
+                    <attribute name="force_save">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="helpdesk_ticket_view_form_inherit_helpdesk_invoicing" model="ir.ui.view">
+            <field name="name">helpdesk.ticket.form</field>
+            <field name="model">helpdesk.ticket</field>
+            <field name="inherit_id" ref="helpdesk_sale.helpdesk_ticket_view_form_inherit_helpdesk_invoicing"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='sale_order_id']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('property_sale_id', 'not in', [False])]}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

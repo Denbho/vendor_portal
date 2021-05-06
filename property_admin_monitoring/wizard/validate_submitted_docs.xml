@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="property_sale_validate_submitted_docs" model="ir.ui.view">
+            <field name="name">property.sale.validate.submitted.docs.form</field>
+            <field name="model">property.sale.validate.submitted.docs</field>
+            <field name="arch" type="xml">
+                <form string="Validate Submitted Docs">
+                    <sheet>
+                        <group string="Document List">
+                            <field name="property_sale_id"/>
+                            <field name="doc_ids" nolabel="1" colspan="2">
+                                <tree string="Doc List" create="false" delete="false" editable="top">
+                                    <field name="submitted" widget="boolean_toggle"/>
+                                    <field name="document_id"/>
+                                    <field name="validation_date"/>
+                                    <field name="expiry_date"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Confirm and Validate Submitted Documents" type="object"
+                                name="process_validated_docs" class="oe_highlight"
+                                confirm="Are you sure? Please note once you click 'OK' there is no Turning Back."
+                        />
+                        <button string="Cancel" class='oe_link' special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+         <record id="property_sale_validate_submitted_docs_action_wizard" model="ir.actions.act_window">
+            <field name="name">Confirm and Validate Submitted Documents</field>
+            <field name="res_model">property.sale.validate.submitted.docs</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

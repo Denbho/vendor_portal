@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="email_template_notif_validated_document" model="mail.template">
+            <field name="name">Property Sales - Documents Received</field>
+            <field name="email_from">"${object.property_sale_id.company_id.name|safe}" &lt;${(object.property_sale_id.company_id.email or user.email)|safe}&gt;</field>
+            <field name="subject">Your Documents Have Been Received and Validated</field>
+            <field name="partner_to">${object.property_sale_id.partner_id.id}</field>
+            <field name="model_id" ref="property_admin_monitoring.model_property_sale_validate_submitted_docs"/>
+            <field name="lang">${object.property_sale_id.partner_id.lang}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <p>Dear ${object.property_sale_id.partner_id.name},</p>
+                <p>
+                    <br>This is to acknowledge that the following documents you submitted have been received and
+                        Validated:</br>
+                </p>
+                <ul>
+                    % for row in object.doc_ids:
+                        % if row.submitted:
+                            <li><p>${row.document_id.name}</p></li>
+                        % endif
+                    % endfor
+                </ul>
+                <p>Log in to Vista Home/Bria Connect App to view submission details and the complete list of document
+                    requirements.</p>
+                <p><br/>Thank you.</p>
+            </field>
+        </record>
+
+        <record id="email_template_document_submission_due_date_reminder" model="mail.template">
+            <field name="name">Property Sales - Documents Submission Reminder</field>
+            <field name="email_from">"${object.company_id.name|safe}" &lt;${(object.company_id.email or user.email)|safe}&gt;</field>
+            <field name="subject"> Reminder to Submit Your Documents</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="property_admin_monitoring.model_property_admin_sale"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html" type="html">
+                <p>Dear ${object.partner_id.name},</p>
+                <p>
+                    <br/>We would like to remind you to submit the following documents on or before ${(object.doc_submission_due_date).strftime('%Y-%m-%d')}:
+                </p>
+                <ul>
+                    % for row in object.stage_document_requirement_list_ids:
+                    % if row.submitted_by_buyer:
+                        <li><p>${row.name}</p></li>
+                    % endif
+                    % endfor
+                </ul>
+                <p>Failure to submit documents may lead to cancellation of your account for your purchased house and lot in
+${object.subdivision_phase_id.name}, ${object.block_lot}</p>
+                <p>For more details, please contact your Admin Account Officer. Kindly disregard this message if you already
+submitted your documents</p>
+                <p><br/>Thank you.</p>
+            </field>
+        </record>
+
+        <record id="email_template_statement_of_account" model="mail.template">
+            <field name="name">Property Sales - Statement of Account</field>
+            <field name="email_from">"${object.company_id.name|safe}" &lt;${(object.company_id.email or user.email)|safe}&gt;</field>
+            <field name="subject">${object.property_sale_id.brand} Statement of Account No. ${object.soa_number} for the month of March for SO No. ${object.so_number}</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="property_admin_monitoring.model_property_sale_statement_of_account"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html" type="html">
+                <p>Dear ${object.partner_id.name},</p>
+                <p>
+                    <br/>Your latest statement of account dated ${(object.soa_date).strftime('%B %d, %Y')} is now available and ready for viewing.
+                </p>
+                <ul>
+                    <p>SO Number: <b>${object.so_number}</b></p>
+                    <p>SOA Number: <b>${object.soa_number}</b></p>
+                    <p>Billing Period: <b>${object.soa_date}</b></p>
+                    <p>Amount: <b>₱ ${"%.2f" % object.total_amount_due}</b></p>
+                    <p>Due date: <b>${object.soa_due_date}</b></p>
+                </ul>
+                <p>Log in to Vista Home/Bria Connect App to view and download your Electronic Statement of Account (eSOA).</p>
+                <p>This is a system-generated message, kindly disregard billing if payment has already been made.<br/></p>
+                <p><br/>Thank you.</p>
+            </field>
+        </record>
+
+
+        <record id="email_template_rejected_credit_committee_approval" model="mail.template">
+            <field name="name">Property Sales - Reject Credit Committee Approval</field>
+            <field name="email_from">"${object.company_id.name|safe}" &lt;${(object.company_id.email or user.email)|safe}&gt;</field>
+            <field name="subject">Rejected: Credit Committee Approval for SO ${object.property_sale_id.so_number}</field>
+            <field name="partner_to">${object.submitted_by.partner_id.id}</field>
+            <field name="model_id" ref="property_admin_monitoring.model_property_sale_credit_committee_approval"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html" type="html">
+                <p>Dear <b>${object.submitted_by.name}</b>,</p>
+                <p>
+                    <br/>Please be informed that your request for credit committee approval for SO ${object.property_sale_id.so_number}' has been rejected.
+                </p>
+                <ul>
+                    <p><b>Rejecting Reason:</b> ${object.rejecting_reason_id.name}</p>
+                    <p><b>Rejecting Notes:</b> ${object.rejecting_notes}</p>
+                </ul>
+                <p><br/>Thank you.</p>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
+
+<!--API for admin qualified-->

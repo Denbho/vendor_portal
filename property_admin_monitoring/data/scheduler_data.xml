@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="ir_cron_compute_property_sale_status_aging" model="ir.cron">
+            <field name="name">Property Sale: Status Aging</field>
+            <field name="model_id" ref="model_property_admin_sale" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="state">code</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+			<field name="code">model.cron_compute_property_sale_status_aging()</field>
+        </record>
+
+        <record id="ir_cron_check_cancellation_request_status" model="ir.cron">
+            <field name="name">Property Sale: Check Cancellation Request Status</field>
+            <field name="model_id" ref="model_property_admin_sale" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="state">code</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+			<field name="code">model.cron_check_cancellation_request_status()</field>
+        </record>
+
+        <record id="ir_cron_check_for_contracted_sale_request_status" model="ir.cron">
+            <field name="name">Property Sale: Check Move to CS Request Status</field>
+            <field name="model_id" ref="model_property_admin_sale" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="state">code</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+			<field name="code">model.cron_check_for_contracted_sale_request_status()</field>
+        </record>
+
+        <record id="ir_cron_check_release_advance_commission" model="ir.cron">
+            <field name="name">Property Sale: Check Commission Release Request Status</field>
+            <field name="model_id" ref="model_property_admin_sale" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="state">code</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+			<field name="code">model.cron_check_release_advance_commission()</field>
+        </record>
+
+        <record id="ir_cron_document_submission_due_date_reminder" model="ir.cron">
+            <field name="name">Property Sale: Documents Submission Reminder</field>
+            <field name="model_id" ref="model_property_admin_sale" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="state">code</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+			<field name="code">model.cron_document_due_reminder()</field>
+        </record>
+
+   </data>
+</odoo>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="property_sale_reject_credit_committee_approval_view_form" model="ir.ui.view">
+            <field name="name">property.sale.reject.credit.committee.approval.form</field>
+            <field name="model">property.sale.reject.credit.committee.approval</field>
+            <field name="arch" type="xml">
+                <form string="Reject Credit Committee Approval">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="rejecting_reason_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="rejecting_reason_id" force_save="1"/>
+                            </h1>
+                        </div>
+                        <group string="Rejecting Notes">
+                            <field name="rejecting_notes" nolabel="1" colspan="2"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Reject Credit Committee Approval" type="object"
+                                name="request_reject" class="oe_highlight"/>
+                        <button string="Cancel" class='oe_link' special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+         <record id="property_sale_reject_credit_committee_approval_action_wizard" model="ir.actions.act_window">
+            <field name="name">Reject Credit Committee Approval</field>
+            <field name="res_model">property.sale.reject.credit.committee.approval</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>
