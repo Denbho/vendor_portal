@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="property_admin_sale_partners_action_form" model="ir.actions.act_window">
+            <field name="name">Property Sales</field>
+            <field name="res_model">property.admin.sale</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('partner_id', '=', active_id)]</field>
+        </record>
+
+        <record id="view_partner_form" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button class="oe_stat_button" type="action"
+                            context="{'default_partner_id': active_id, 'default_customer_number': partner_assign_number}"
+                            name="%(property_admin_sale_partners_action_form)d" icon="fa-home">
+                        <field string="Properties" name="property_sale_count" widget="statinfo"/>
+                    </button>
+                </div>
+                <group name="purchase" position="inside">
+                    <field name="company_code"/>
+                    <field name="sales_account_number"/>
+                    <field name="vendor_group"/>
+                    <field name="broker_level"/>
+                </group>
+            </field>
+        </record>
+
+        <record id="view_sappartner_form" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="contact_personal_information.view_partner_form"/>
+            <field name="arch" type="xml">
+                <field name="religion_id" position="replace">
+                    <field name="religion_id" invisible="1"/>
+                    <field name="sap_religion"/>
+                </field>
+                <field name="profession_id" position="replace">
+                    <field name="profession_id" invisible="1"/>
+                    <field name="profession"/>
+                </field>
+                <page name="personal" position="after">
+                    <page name="sap_fields" string="Other SAP Fields">
+                        <group>
+                            <field name="sap_title"/>
+                            <field name="sap_business_entity_identification"/>
+                            <field name="sap_city"/>
+                            <field name="sap_province"/>
+                            <field name="sap_country"/>
+                            <field name="sap_continent"/>
+                            <field name="sap_employment_status"/>
+                            <field name="sap_employment_country"/>
+                            <field name="sap_nationality"/>
+                            <field name="sap_other_field"/>
+                        </group>
+                    </page>
+                </page>
+            </field>
+        </record>
+
+    </data>
+</odoo>

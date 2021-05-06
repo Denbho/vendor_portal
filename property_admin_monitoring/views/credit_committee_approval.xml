@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="property_sale_credit_committee_approval_view_form" model="ir.ui.view">
+            <field name="name">property.sale.credit.committee.approval.view.form</field>
+            <field name="model">property.sale.credit.committee.approval</field>
+            <field name="arch" type="xml">
+                <form string="Credit committee Approval Form">
+                    <header>
+                        <button string="Submit" type="object" states="draft"
+                                name="request_submit" class="oe_highlight"/>
+                        <button string="Verify" type="object" states="waiting for verification"
+                                name="request_verify" class="oe_highlight"/>
+                        <button string="Approve" type="object" states="waiting for approval"
+                                name="request_approve" class="oe_highlight"/>
+                        <button string="Reject" type="action" states="waiting for approval,waiting for verification"
+                                name="%(property_sale_reject_credit_committee_approval_action_wizard)d"/>
+                        <button string="Reset to Draft" type="object" states="rejected"
+                                name="request_reset_to_draft" class="oe_highlight"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="property_sale_id" string="Property Sale"/>
+                            <h1>
+                                <field name="property_sale_id" force_save="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="so_date"/>
+                                <field name="so_number"/>
+                                <field name="partner_id"/>
+                            </group>
+                            <group>
+                                <field name="company_id" invisible="1"/>
+                                <field name="brand"/>
+                                <field name="block_lot"/>
+                            </group>
+                        </group>
+                        <group string="Request Notes">
+                            <field name="note" nolabel="1" colspan="2"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="property_sale_credit_committee_approval_view_tree" model="ir.ui.view">
+            <field name="name">property.sale.credit.committee.approval.view.tree</field>
+            <field name="model">property.sale.credit.committee.approval</field>
+            <field name="arch" type="xml">
+                <tree string="Credit committee Approval Tree">
+                    <field name="property_sale_id"/>
+                    <field name="so_date"/>
+                    <field name="so_number"/>
+                    <field name="partner_id"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="brand"/>
+                    <field name="block_lot"/>
+                    <field name="note"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="property_sale_credit_committee_approval_action" model="ir.actions.act_window">
+            <field name="name">Credit Committee Approval</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">property.sale.credit.committee.approval</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_property_sale_credit_committee_approval_action" parent="menu_property_sale_monitoring"
+                  action="property_sale_credit_committee_approval_action" sequence="2"/>
+
+    </data>
+</odoo>

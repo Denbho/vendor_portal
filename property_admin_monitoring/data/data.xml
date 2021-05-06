@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="sale_stage_reserved" model="property.sale.status">
+            <field name="name">Reserved</field>
+            <field name="sequence">1</field>
+            <field name="active">1</field>
+            <field name="with_predecessor">0</field>
+        </record>
+
+        <record id="sale_stage_uncontracted" model="property.sale.status">
+            <field name="name">Uncontracted</field>
+            <field name="sequence">2</field>
+            <field name="active">1</field>
+            <field name="with_predecessor">1</field>
+            <field name="predecessor_stage_id" ref="property_admin_monitoring.sale_stage_reserved"/>
+        </record>
+
+        <record id="sale_stage_contracted" model="property.sale.status">
+            <field name="name">Contracted</field>
+            <field name="sequence">3</field>
+            <field name="active">1</field>
+            <field name="with_predecessor">1</field>
+            <field name="predecessor_stage_id" ref="property_admin_monitoring.sale_stage_uncontracted"/>
+        </record>
+
+        <record id="sale_stage_loan_released" model="property.sale.status">
+            <field name="name">Loan Released</field>
+            <field name="sequence">4</field>
+            <field name="active">1</field>
+            <field name="with_predecessor">1</field>
+            <field name="predecessor_stage_id" ref="property_admin_monitoring.sale_stage_contracted"/>
+        </record>
+
+        <record id="sale_stage_turned_over" model="property.sale.status">
+            <field name="name">Turned Over</field>
+            <field name="sequence">5</field>
+            <field name="active">1</field>
+            <field name="with_predecessor">1</field>
+            <field name="predecessor_stage_id" ref="property_admin_monitoring.sale_stage_loan_released"/>
+        </record>
+
+        <record id="sale_stage_title_transferred" model="property.sale.status">
+            <field name="name">Title Transferred</field>
+            <field name="sequence">6</field>
+            <field name="active">1</field>
+            <field name="with_predecessor">1</field>
+            <field name="predecessor_stage_id" ref="property_admin_monitoring.sale_stage_turned_over"/>
+        </record>
+
+        <record id="sale_stage_canceled" model="property.sale.status">
+            <field name="name">Canceled</field>
+            <field name="sequence">7</field>
+            <field name="active">1</field>
+            <field name="canceled">1</field>
+        </record>
+
+        <record id="sale_sub_stage_ongoing_assessment" model="property.sale.sub.status">
+            <field name="name">Ongoing Assessment</field>
+            <field name="sequence">1</field>
+            <field name="active">1</field>
+            <field name="with_predecessor">0</field>
+            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_uncontracted"/>
+        </record>
+
+        <record id="sale_sub_stage_for_compliance" model="property.sale.sub.status">
+            <field name="name">For Compliance</field>
+            <field name="sequence">2</field>
+            <field name="active">1</field>
+            <field name="predecessor_stage_id" ref="property_admin_monitoring.sale_sub_stage_ongoing_assessment"/>
+            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_uncontracted"/>
+        </record>
+
+        <record id="sale_sub_stage_qualified" model="property.sale.sub.status">
+            <field name="name">Admin Qualified</field>
+            <field name="sequence">3</field>
+            <field name="active">1</field>
+            <field name="trigger_admin_qualified">1</field>
+            <field name="predecessor_stage_id" ref="property_admin_monitoring.sale_sub_stage_for_compliance"/>
+            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_uncontracted"/>
+            <field name="with_successor">0</field>
+        </record>
+
+        <record id="sale_sub_stage_not_qualified" model="property.sale.sub.status">
+            <field name="name">Not Qualified</field>
+            <field name="sequence">4</field>
+            <field name="active">1</field>
+            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_uncontracted"/>
+            <field name="with_successor">0</field>
+            <field name="with_predecessor">0</field>
+            <field name="canceled">1</field>
+        </record>
+
+    </data>
+</odoo>

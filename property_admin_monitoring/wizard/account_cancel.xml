@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="property_request_account_cancel_view_form" model="ir.ui.view">
+            <field name="name">property.request.account.cancel.form</field>
+            <field name="model">property.request.account.cancel</field>
+            <field name="arch" type="xml">
+                <form string="Request account to cancel">
+                    <sheet>
+                        <group>
+                            <field name="for_cancellation_date" invisible="1"/>
+                            <field name="cancellation_reason_id"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Set Account For Cancellation" type="object" name="set_account_for_cancellation" class="oe_highlight"/>
+                        <button string="Cancel" class='oe_link' special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+         <record id="property_request_account_cancel_action_wizard" model="ir.actions.act_window">
+            <field name="name">Set Account For Cancellation</field>
+            <field name="res_model">property.request.account.cancel</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>
