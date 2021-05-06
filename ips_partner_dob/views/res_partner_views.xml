@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_partner_form">
+      <field name="name">ips_partner_dob list</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='title']" position="after">
+        	<field name="date_of_birth" attrs="{'invisible': [('is_company', '=', True)]}"/>
+        	<field name="send_hbd_email" attrs="{'invisible': ['|',('is_company', '=', True),('date_of_birth','=',False)]}"/>
+        	<field name="hbd_email_template_id" attrs="{'invisible': [('send_hbd_email', '=', False)], 'required':[('send_hbd_email', '!=', False)]}"/>
+        	<field name="last_hbd_email_sent" groups="base.group_no_one" />
+        </xpath>
+      </field>
+    </record>
+    
+    <record model="ir.ui.view" id="view_res_partner_filter">
+      <field name="name">res.partner.select</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_res_partner_filter" />
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='parent_id']" position="after">
+        	<separator />
+        	<field name="date_of_birth"/>
+        	<field name="dyob"/>
+        	<field name="mob"/>
+        	<field name="yob"/>
+        </xpath>
+        <xpath expr="//group/filter[@name='salesperson']" position="after">
+        	<filter name="dyob" string="Day of Birth" domain="[]" context="{'group_by' : 'dyob'}"/>
+        	<filter name="mob" string="Month of Birth" domain="[]" context="{'group_by' : 'mob'}"/>
+        	<filter name="yob" string="Year of Birth" domain="[]" context="{'group_by' : 'yob'}"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
