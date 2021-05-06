@@ -1,0 +1,4 @@
+[submodule "yezyilomo/odoo-rest-api"]
+	path = yezyilomo/odoo-rest-api
+	url = git@github.com:yezyilomo/odoo-rest-api.git
+	branch = master
