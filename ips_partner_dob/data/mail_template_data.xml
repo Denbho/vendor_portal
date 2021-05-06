@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!--Email template -->
+        <record id="email_template_partner_happy_birthday" model="mail.template">
+            <field name="name">Partner's Birthday - Send by Email</field>
+            <field name="email_from">"${object.company_id.name|safe}" &lt;${(object.company_id.email or user.email)|safe}&gt;</field>
+            <field name="subject">Happy Birthday to ${object.name or 'n/a'})</field>
+            <field name="partner_to">${object.id}</field>
+            <field name="model_id" ref="ips_partner_dob.model_res_partner"/>
+            <field name="lang">${object.lang}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+                <div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+                    <table cellspacing="0" cellpadding="0" style="width:600px;background:inherit;color:inherit">
+                        <tbody>
+                            <tr>
+                                <td valign="center" width="200" style="padding:10px 10px 10px 5px;font-size: 12px">
+                                    <img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;"
+                                         alt="${user.company_id.name}"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+                    <h2 style="color:#800080">Happy Happy Birthday!</h2>
+                    <div>
+                        <p>
+                            From all your friends at ${object.company_id.name|safe}, we are extremely excited for you on reaching such a milestone in your life.
+                            <br/>
+                            We hope all the days of your life will be as great as you are to us.
+                            <br/>
+                            Happy birthday!
+                            <br/>
+                        </p>
+                    </div>
+                </div>
+                <div style="padding:0px;width:600px;margin:auto; margin-top: 10px; background: #fff repeat top /100%;color:#777777">
+                    ${user.signature | safe}
+                    <p style="font-size: 11px; margin-top: 10px;">
+                        <strong>Sent by ${user.company_id.name}</strong>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>
