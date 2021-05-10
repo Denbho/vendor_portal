@@ -12,6 +12,7 @@
         'admin_purchase_requisition',
         ],
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/invoice_delivery.xml',
         'views/purchase_order_view.xml',

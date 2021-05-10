@@ -52,6 +52,9 @@
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="action_view_events" type="object" icon="fa-calendar">
+                                <field string="Events" name="event_count" widget="statinfo"/>
+                            </button>
                             <button class="oe_stat_button" name="action_view_vendor" type="object" icon="fa-users">
                                 <field string="Bidders" name="vendor_count" widget="statinfo"/>
                             </button>

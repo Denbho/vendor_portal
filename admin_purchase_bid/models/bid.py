@@ -47,6 +47,10 @@ class PurchaseBid(models.Model):
         for record in self:
             record.vendor_count = len([line.id for line in record.vendor_line])
 
+    def _compute_event_count(self):
+        for record in self:
+            record.event_count = len(self.env['event.event'].search([('bid_id','=',record.id)]))
+
     @api.model
     def default_get(self, default_fields):
         res = super(PurchaseBid, self).default_get(default_fields)
@@ -136,6 +140,7 @@ class PurchaseBid(models.Model):
                                            store=True)
     invitation_sent = fields.Boolean(string='Invitation Sent', copy=False)
     vendor_count = fields.Integer(compute='_compute_vendor_count', string='Bidders Count')
+    event_count = fields.Integer(compute='_compute_event_count', string='Events Count')
     check_date_prebid_postbid = fields.Boolean(compute='_compute_check_date_prebid_postbid',
                                                string='Check date for Pre-Bid & Post-Bid')
     pr_related_ids = fields.Many2many('purchase.requisition.material.details', string='PR Related',
@@ -489,6 +494,20 @@ class PurchaseBid(models.Model):
                     new_evaluator = self.env['vendor.evaluator'].create(v)
                     m_subject = 'Evaluation Reminder for Bid: '+ self.name +', Vendor: '+ln.partner_id.name
                     new_evaluator.send_admin_email_notif('bid_evaluation', m_subject, new_evaluator.evaluator_id.email, 'vendor.evaluator')
+
+    def action_view_events(self):
+        self.ensure_one()
+        return {
+            'name': _('Events'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'kanban,calendar,tree,form,pivot',
+            'res_model': 'event.event',
+            'domain': [('bid_id', '=', self.id)],
+            'target': 'current',
+            'context': {
+                'default_bid_id': self.id,
+            },
+        }
 
 
 class PurchaseBidVendor(models.Model):

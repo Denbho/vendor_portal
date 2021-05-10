@@ -13,8 +13,10 @@
         'admin_purchase_requisition',
         'admin_email_notif',
         'hr',
+        'event',
         ],
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'report/purchase_bid_report_template.xml',
         'report/purchase_bid_report.xml',
