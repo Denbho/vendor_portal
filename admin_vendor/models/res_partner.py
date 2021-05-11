@@ -65,7 +65,9 @@ class ResPartner(models.Model):
     overall_assessment = fields.Float(string='Overall Assessment', track_visibility="always")
     extend_result = fields.Boolean(string='Extend Result to Vendor?', track_visibility="always")
     evaluation_count = fields.Integer(compute="_get_evaluation_count")
-    supplier_number = fields.Char('Supplier No.')
+    supplier_number = fields.Char('Supplier No.', track_visibility="always")
+    has_other_category = fields.Boolean('Other', track_visibility="always")
+    other_categories = fields.Text('Other Categories', track_visibility="always")
 
     _sql_constraints = [
         ('supplier_number_key', 'unique(supplier_number)',  "You can't have two vendors with the same supplier number !")
@@ -238,6 +240,7 @@ class ProductServiceOffered(models.Model):
 
     name = fields.Char(string="Product/Service Description", required=True)
     product_service = fields.Char(string="Product/Service")
+    product_id = fields.Many2one('product.product', string="Product")
     partner_id = fields.Many2one('res.partner', string="Vendor")
     uom_id = fields.Many2one('uom.uom', string="UOM")
     sequence = fields.Integer(string='Sequence', default=10)
@@ -245,6 +248,19 @@ class ProductServiceOffered(models.Model):
     product_category_id = fields.Many2one('product.category', string='Product Category')
     display_type = fields.Selection([('line_section', "Section"), ('line_note', "Note")], default=False,
                                     help="Technical field for UX purpose.", string='Display Type')
+
+    def view_product(self):
+        self.ensure_one()
+        context = self._context.copy()
+        return {
+            'name': _('Product'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree,form',
+            'res_model': 'product.product',
+            'domain': [('id', '=', self.product_id.id)],
+            'target': 'current',
+            'context': context,
+        }
 
 
 class PartnerEvaluation(models.Model):

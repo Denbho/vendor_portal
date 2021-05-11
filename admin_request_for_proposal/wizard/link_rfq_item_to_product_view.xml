@@ -11,7 +11,7 @@
                         <group>
                             <group>
                                 <field name="rfp_product_line_id" invisible="1"/>
-                                <field name="product_id" context="{'default_name': product_name, 'default_description_purchase': name, 'default_standard_price': price}"/>
+                                <field name="product_id" context="{'default_name': product_name, 'default_description_purchase': name, 'default_standard_price': price, 'default_lst_price': price}"/>
                                 <field name="product_name"/>
                                 <field name="name"/>
                                 <field name="unit_name"/>

@@ -12,6 +12,7 @@
         'admin_request_for_quotation',
         ],
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/stock_location.xml',
         'views/admin_purchase_requisition_view.xml',

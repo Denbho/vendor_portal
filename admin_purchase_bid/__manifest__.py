@@ -23,6 +23,7 @@
         'views/bid_view.xml',
         'views/contracts_and_agreements_view.xml',
         'views/purchase_requisition_view.xml',
+        'views/event_view.xml',
         'data/bid_cron_view.xml',
         'data/mail_template_data.xml',
     ],

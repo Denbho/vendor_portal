@@ -28,6 +28,10 @@
                                 class="oe_highlight" states="send_bid_invitation,invitation_sent"/>
                         <button name="action_force_postbid" type="object" string="Force Post-Bid"
                                 class="oe_highlight" states="pre_bidding"/>
+                        <button name="action_halt" type="object" string="Halt"
+                                states="pre_bidding"/>
+                        <button name="action_resume" type="object" string="Resume"
+                                class="oe_highlight" states="halted"/>
                         <button name="action_bid_selection" type="object" string="Bid Selection"
                                 class="oe_highlight" states="post_bidding"/>
                         <button name="action_submit_to_verify_bid_selection" type="object"
@@ -69,17 +73,18 @@
                                 <field name="project_name" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                                 <field name="project_location" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                                 <field name="wbs_element" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
-                                <field name="purchasing_officer"
-                                       attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+                                <field name="purchasing_officer" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                                 <field name="scope_of_work" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                             </group>
                             <group>
+                                <field name="company_id" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                                 <field name="bid_opening_date" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                                 <field name="bid_closing_date"
                                        attrs="{
                         'readonly': [('state', 'not in', ['draft','waiting_for_verification','waiting_for_approval'])],
                         'required': [('state', '=', 'waiting_for_approval')]}"/>
-                                <field name="document_reminder_date" invisible="0"/>
+                                <field name="date_halted" readonly="1" attrs="{'invisible': [('date_halted', '=', False)]}"/>
+                                <field name="date_resume" readonly="1" attrs="{'invisible': [('date_resume', '=', False)]}"/>
                                 <field name="budget" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                                 <field name="price_ceiling" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                                 <field name="target_price" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
@@ -169,7 +174,8 @@
                                 </field>
                                 <group string="PR Bid Related"/>
                                 <field name="pr_related_ids" no_label="1"
-                                       attrs="{'readonly': [('state', 'not in', ['draft'])]}">
+                                       attrs="{'readonly': [('state', 'not in', ['draft'])]}"
+                                       domain="[('sourcing', '=', 'bidding'),('company_id','=',company_id)]">
                                     <tree string="PR Related" edit="false">
                                         <field name="request_id" string="PR #"/>
                                         <field name="product_id"/>
@@ -319,8 +325,11 @@
                     <field name="scope_of_work"/>
                     <field name="scope_of_work_remark" widget="html" optional="hide"/>
                     <field name="purchasing_officer"/>
+                    <field name="company_id"/>
                     <field name="bid_opening_date"/>
                     <field name="bid_closing_date"/>
+                    <field name="date_halted" optional="hide"/>
+                    <field name="date_resume" optional="hide"/>
                     <field name="state"/>
                     <field name="date_created" optional="hide"/>
                     <field name="budget" optional="hide"/>
@@ -368,6 +377,25 @@
                     <field name="name" class="oe_inline" placeholder="Define your reasons ..."/>
                     <footer>
                         <button name="action_confirm_kick" string="Remove" type="object" class="oe_highlight"/>
+                        <button string="Cancel" class="btn btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_halt_bidding_wizard" model="ir.ui.view">
+            <field name="name">halt.bidding.wizard.view</field>
+            <field name="model">halt.bidding</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                  <group>
+                    <field name="date_halted"/>
+                    <field name="date_resume"/>
+                    <field name="bid_closing_date"/>
+                  </group>
+                    <footer>
+                        <button name="action_halt_bidding" string="Halt" type="object" class="oe_highlight"/>
                         <button string="Cancel" class="btn btn-default" special="cancel"/>
                     </footer>
                 </form>

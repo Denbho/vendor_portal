@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="admin_link_vendor_item_to_product_form" model="ir.ui.view">
+            <field name="name">admin.link.vendor.item.to.product.form</field>
+            <field name="model">admin.link.vendor.item.to.product</field>
+            <field name="arch" type="xml">
+                <form string="Link Vendor Item to Product">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="vendor_product_line_id" invisible="1"/>
+                                <field name="product_id" context="{'default_name': name, 'default_description_purchase': product_service, 'default_uom_id': uom_id, 'default_uom_po_id': uom_id, 'default_standard_price': price, 'default_lst_price': price, 'default_categ_id': product_category_id}"/>
+                                <field name="name"/>
+                                <field name="product_service"/>
+                            </group>
+                            <group>
+                              <field name="product_category_id"/>
+                              <field name="uom_id"/>
+                              <field name="price"/>
+                              <field name="partner_id"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Link to Product" type="object"
+                                name="link_to_product" class="oe_highlight"/>
+                        <button string="Cancel" class='oe_link' special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="admin_link_vendor_item_to_product_action_wizard" model="ir.actions.act_window">
+            <field name="name">Link Vendor Item to Product</field>
+            <field name="res_model">admin.link.vendor.item.to.product</field>
+            <field name="view_mode">form</field>
+            <field name="context">{'default_vendor_product_line_id': active_id}</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>

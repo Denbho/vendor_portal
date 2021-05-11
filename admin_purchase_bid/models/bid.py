@@ -15,6 +15,7 @@ _STATES = [
     ('send_bid_invitation', 'Sending Bid Invitation'),
     ('invitation_sent', 'Bid Invitation Sent'),
     ('pre_bidding', 'Pre-Bidding'),
+    ('halted', 'Halted'),
     ('post_bidding', 'Post-Bidding'),
     ('bid_selection', 'Bid Selection'),
     ('waiting_bid_selection_ver', 'Waiting for Bid Selection Verification'),
@@ -97,6 +98,7 @@ class PurchaseBid(models.Model):
             self.bid_summary = bid_summary
 
     name = fields.Char(string='Bid', required=True, copy=False, default=lambda self: _('New'), readonly=True)
+    company_id = fields.Many2one('res.company', 'Company', required=True, default=lambda self: self.env.company, track_visibility='onchange')
     project_name = fields.Char(string='Project Name', required=True, track_visibility='onchange')
     project_location = fields.Char(string='Project Location', track_visibility='onchange')
     wbs_element = fields.Char(string='Wbs Element', track_visibility='onchange')
@@ -106,6 +108,8 @@ class PurchaseBid(models.Model):
                                          track_visibility='onchange')
     bid_opening_date = fields.Datetime(string="Bid Opening Date", required=True, track_visibility='onchange')
     bid_closing_date = fields.Datetime(string="Bid Closing Date", track_visibility='onchange')
+    date_halted = fields.Datetime(string="Date Halted", track_visibility='onchange')
+    date_resume = fields.Date(string="Date Resume", track_visibility='onchange')
     document_reminder_date = fields.Date(string="Document Submission Reminder Date")
     budget = fields.Float(string="Budget", track_visibility='onchange')
     price_ceiling = fields.Float(string="Price Ceiling", track_visibility='onchange')
@@ -143,8 +147,7 @@ class PurchaseBid(models.Model):
     event_count = fields.Integer(compute='_compute_event_count', string='Events Count')
     check_date_prebid_postbid = fields.Boolean(compute='_compute_check_date_prebid_postbid',
                                                string='Check date for Pre-Bid & Post-Bid')
-    pr_related_ids = fields.Many2many('purchase.requisition.material.details', string='PR Related',
-                                      domain=[('sourcing', '=', 'bidding')])
+    pr_related_ids = fields.Many2many('purchase.requisition.material.details', string='PR Related')
     assigned_evaluator_line = fields.One2many('assigned.evaluator.line', 'bid_id', string='Assigned Evaluator', copy=True)
     # Approver
     confirmed_by = fields.Many2one('res.users', string="Confirmed By", track_visibility='onchange')
@@ -310,6 +313,34 @@ class PurchaseBid(models.Model):
                 'default_document_requirement_available_id': [(6, 0, document_requirement_ids)],
             },
         }
+
+    @api.model
+    def _pre_bidding(self):
+        records = self.search([
+            ('state', 'in', ['send_bid_invitation', 'invitation_sent']),
+            ('bid_opening_date', '<=', datetime.now()),
+        ])
+        for rec in records:
+            rec.state = 'pre_bidding'
+
+    @api.model
+    def _post_bidding(self):
+        records = self.search([
+            ('state', '=', 'pre_bidding'),
+            ('bid_closing_date', '<=', datetime.now()),
+        ])
+        for rec in records:
+            rec.state = 'post_bidding'
+            rec.assign_evaluators()
+
+    @api.model
+    def _resume_bidding(self):
+        records = self.search([
+            ('state', '=', 'halted'),
+            ('date_resume', '<=', fields.Date.today()),
+        ])
+        for rec in records:
+            rec.state = 'pre_bidding'
 
     @api.model
     def _document_submission_reminder(self):
@@ -508,6 +539,20 @@ class PurchaseBid(models.Model):
                 'default_bid_id': self.id,
             },
         }
+
+    def action_halt(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Halt Bidding'),
+            'res_model': 'halt.bidding',
+            'target': 'new',
+            'view_mode': 'form',
+            'context': {'default_bid_closing_date': self.bid_closing_date},
+        }
+
+    def action_resume(self):
+        self.state = 'pre_bidding'
 
 
 class PurchaseBidVendor(models.Model):
@@ -733,6 +778,24 @@ class KickOutReason(models.TransientModel):
         active_id = context['active_id']
         active_entry = self.env[active_model].browse(active_id)
         active_entry.write({'kick_out_reason': self.name, 'is_kicked': True})
+
+
+class HaltBidding(models.TransientModel):
+    _name = "halt.bidding"
+    _description = "Halt Bidding"
+
+    bid_closing_date = fields.Datetime(string="Bid Closing Date", required=True)
+    date_halted = fields.Datetime(string="Date Halted", required=True, default=datetime.now())
+    date_resume = fields.Date(string="Date Resume", required=True)
+
+    def action_halt_bidding(self):
+        context = self.env.context
+        active_model = context['active_model']
+        active_id = context['active_id']
+        active_entry = self.env[active_model].browse(active_id)
+        if self.date_resume >= self.bid_closing_date.date():
+            raise Warning("Bid closing date must be greater than date resume.")
+        active_entry.write({'state': 'halted', 'bid_closing_date': self.bid_closing_date, 'date_halted': self.date_halted, 'date_resume': self.date_resume})
 
 
 class VendorEvaluationLine(models.Model):

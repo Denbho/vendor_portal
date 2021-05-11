@@ -204,6 +204,8 @@ class AdminRequestForQuotation(models.Model):
     ], string='Status', readonly=True, copy=False, index=True, tracking=True, default='draft')
     name = fields.Char('Request Reference', copy=False, readonly=True, index=True,
                        default=lambda self: _('New'))
+    company_id = fields.Many2one('res.company', 'Company', required=True,
+                        default=lambda self: self.env.company, tracking=True,)
     user_id = fields.Many2one('res.users', string='Purchasing Officer', index=True, tracking=True,
                               default=lambda self: self.env.user)
     create_date = fields.Datetime(

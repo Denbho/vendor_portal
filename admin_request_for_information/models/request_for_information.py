@@ -41,6 +41,9 @@ class AdminRequestForInformation(models.Model):
                              default='draft', readonly=True, copy=False, track_visibility="always")
     name = fields.Char('Request Reference', copy=False, readonly=True, index=True,
                        default=lambda self: _('New'))
+    company_id = fields.Many2one('res.company', 'Company', required=True, readonly=True,
+                        default=lambda self: self.env.company, track_visibility="always",
+                        states={'draft': [('readonly', False)]})
     user_id = fields.Many2one('res.users', string='Purchasing Officer', index=True, tracking=True, required=True,
                               default=lambda self: self.env.user, track_visibility="always", readonly=True,
                               states={'draft': [('readonly', False)]})

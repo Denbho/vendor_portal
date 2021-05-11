@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+      <record id="rfq_by_company_rule" model="ir.rule">
+          <field name="name">RFQ: By Company</field>
+          <field ref="admin_request_for_quotation.model_admin_request_for_quotation" name="model_id"/>
+          <field name="domain_force">[('company_id','in',[line.id for line in user.company_ids])]</field>
+      </record>
+
+    </data>
+</odoo>
