@@ -38,8 +38,18 @@
                 </field>
                 <xpath expr="//page[@name='sales_purchases']" position="before">
                     <page name="products_and_services" string="Products &amp; Services">
-                        <group string="Product Categories"/>
-                        <field name="product_category_ids" widget="many2many_checkboxes"/>
+                        <group>
+                          <group>
+                            <separator string="Product Categories"/>
+                            <field name="product_category_ids" nolabel="1" colspan="2" widget="many2many_checkboxes"/>
+                          </group>
+                          <group>
+                            <separator string="Other Categories"/>
+                            <field name="has_other_category"/>
+                            <field name="other_categories" nolabel="1" colspan="2" placeholder="Other categories ..."
+                                attrs="{'invisible':[('has_other_category','=',False)]}"/>
+                          </group>
+                        </group>
                         <group string="Products/Services Offered"/>
                         <field name="product_service_offered_line" no_label="1"
                                widget="section_and_note_one2many"
@@ -53,12 +63,18 @@
                                             context="{'default_display_type': 'line_note'}"/>
                                 </control>
                                 <field name="display_type" invisible="1"/>
+                                <field name="product_id" invisible="1"/>
                                 <field name="sequence" widget="handle"/>
                                 <field name="product_service"/>
                                 <field name="name" widget="section_and_note_text"/>
                                 <field name="product_category_id"/>
                                 <field name="price"/>
                                 <field name="uom_id"/>
+                                <button string="Link to Product" type="action" class="oe_highlight"
+                                        name="%(admin_link_vendor_item_to_product_action_wizard)d"
+                                        attrs="{'invisible': [('product_id', '!=', False)]}"/>
+                                <button string="Open Product" name="view_product" type="object" class="oe_highlight"
+                                        attrs="{'invisible': [('product_id', '=', False)]}"/>
                             </tree>
                         </field>
                     </page>

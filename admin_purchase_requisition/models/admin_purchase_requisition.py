@@ -97,7 +97,7 @@ class PurchaseRequisitionMaterialDetails(models.Model):
 
     request_id = fields.Many2one('admin.purchase.requisition', string='PR Reference', required=True, ondelete='cascade',
                                  index=True, copy=False)
-    company_id = fields.Many2one('res.company', string='Company', store=True)
+    company_id = fields.Many2one('res.company', string='Company')
     product_id = fields.Many2one('product.product', string='Material', required=True)
     product_categ_id = fields.Many2one('product.category', string='Material Group')
     material_description = fields.Text(string='Material Description')

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+      <record id="bid_by_company_rule" model="ir.rule">
+          <field name="name">Bidding: By Company</field>
+          <field ref="admin_purchase_bid.model_purchase_bid" name="model_id"/>
+          <field name="domain_force">[('company_id','in',[line.id for line in user.company_ids])]</field>
+      </record>
+
+    </data>
+</odoo>

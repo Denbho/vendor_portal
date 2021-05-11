@@ -46,12 +46,13 @@
                                 <field name="latest_price" widget="html"/>
                                 <field name="acct_assignment_categ" optional="hide"/>
                                 <field name="cost_center_id" optional="hide"/>
-                                <field name="release_indicator" readonly="1" optional="hide"/>
+                                <field name="release_indicator" optional="hide"/>
                                 <field name="sourcing" optional="hide"/>
                                 <field name="processing_status" optional="hide"/>
                                 <field name="requisitioner_id" optional="hide"/>
                                 <field name="pr_releaser_id" optional="hide"/>
                                 <field name="purchasing_group_id" optional="hide"/>
+                                <field name="company_id" optional="hide"/>
                                 <field name="warehouse_id" optional="hide"/>
                                 <field name="location" optional="hide"/>
                                 <field name="unloading_point" optional="hide"/>
@@ -59,7 +60,6 @@
                                 <field name="asset_code" optional="hide"/>
                                 <field name="internal_order" optional="hide"/>
                                 <field name="rfq_id" optional="hide"/>
-                                <field name="company_id" invisible="1"/>
                                 <field name="state" invisible="1"/>
                             </tree>
                         </field>
@@ -121,6 +121,7 @@
                                 <field name="material_description"/>
                                 <field name="quantity"/>
                                 <field name="product_uom"/>
+                                <field name="company_id" readonly="1" force_save="1"/>
                                 <field name="rfq_id" readonly="1" force_save="1"/>
                             </group>
                             <group>
@@ -138,7 +139,6 @@
                                 <field name="asset_code"/>
                                 <field name="internal_order" readonly="1"/>
                                 <field name="state" invisible="1"/>
-                                <field name="company_id" invisible="1"/>
                             </group>
                         </group>
                         <group>

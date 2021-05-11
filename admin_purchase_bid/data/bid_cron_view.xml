@@ -9,4 +9,31 @@
         <field name='interval_type'>days</field>
         <field name="numbercall">-1</field>
     </record>
+    <record id="ir_cron_resume_bidding" model="ir.cron">
+        <field name="name">Resume Bidding</field>
+        <field name="model_id" ref="model_purchase_bid"/>
+        <field name="state">code</field>
+        <field name="code">model._resume_bidding()</field>
+        <field name='interval_number'>1</field>
+        <field name='interval_type'>days</field>
+        <field name="numbercall">-1</field>
+    </record>
+    <record id="ir_cron_pre_bidding" model="ir.cron">
+        <field name="name">Pre-Bidding</field>
+        <field name="model_id" ref="model_purchase_bid"/>
+        <field name="state">code</field>
+        <field name="code">model._pre_bidding()</field>
+        <field name='interval_number'>1</field>
+        <field name='interval_type'>days</field>
+        <field name="numbercall">-1</field>
+    </record>
+    <record id="ir_cron_post_bidding" model="ir.cron">
+        <field name="name">Post-Bidding</field>
+        <field name="model_id" ref="model_purchase_bid"/>
+        <field name="state">code</field>
+        <field name="code">model._post_bidding()</field>
+        <field name='interval_number'>1</field>
+        <field name='interval_type'>days</field>
+        <field name="numbercall">-1</field>
+    </record>
 </odoo>

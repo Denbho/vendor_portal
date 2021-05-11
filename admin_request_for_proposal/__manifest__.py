@@ -17,6 +17,7 @@
         'wizard/link_rfq_item_to_product_view.xml',
         'views/request_for_proposal.xml',
         'security/ir.model.access.csv',
+        'security/security.xml',
     ],
     'installable': True,
     'auto_install': False,

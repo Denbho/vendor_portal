@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+      <record id="view_event_form" model="ir.ui.view">
+          <field name="name">event.event.form</field>
+          <field name="model">event.event</field>
+          <field name="inherit_id" ref="event.view_event_form"/>
+          <field name="arch" type="xml">
+              <field name="auto_confirm" position="after">
+                  <field name="bid_id" readonly="1" force_save="1"/>
+              </field>
+          </field>
+      </record>
+
+      <record id="view_event_kanban" model="ir.ui.view">
+          <field name="name">event.event.kanban</field>
+          <field name="model">event.event</field>
+          <field name="inherit_id" ref="event.view_event_kanban"/>
+          <field name="arch" type="xml">
+              <field name="color" position="after">
+                  <field name="bid_id"/>
+              </field>
+              <xpath expr="//div[contains(@class, 'o_event_right')]" position="inside">
+                <div class="bid_kanban">
+                  <t t-if="record.bid_id.raw_value"><b>Bid No.: </b><field name="bid_id"/></t>
+                </div>
+              </xpath>
+          </field>
+      </record>
+
+      <record id="view_event_search" model="ir.ui.view">
+          <field name="name">event.event.search</field>
+          <field name="model">event.event</field>
+          <field name="inherit_id" ref="event.view_event_search"/>
+          <field name="arch" type="xml">
+              <field name="user_id" position="after">
+                <field name="bid_id"/>
+              </field>
+              <xpath expr="//group/filter[@name='status']" position="after">
+                <filter string="Bids" name="bid_id" context="{'group_by': 'bid_id'}"/>
+              </xpath>
+          </field>
+      </record>
+
+    </data>
+</odoo>

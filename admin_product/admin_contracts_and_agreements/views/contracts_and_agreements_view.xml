@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+      <record id="sequence_contracts_and_agreements" model="ir.sequence">
+          <field name="name">Contracts and Agreements</field>
+          <field name="code">contracts.and.agreements</field>
+          <field name="prefix">CON</field>
+          <field name="padding">5</field>
+          <field name="company_id" eval="False"/>
+      </record>
+
+      <record id="contracts_and_agreements_form" model="ir.ui.view">
+          <field name="name">contracts.and.agreements.view.form</field>
+          <field name="model">contracts.and.agreements</field>
+          <field name="arch" type="xml">
+            <form string="Contracts and Agreements">
+              <header>
+                  <button name="action_submit" type="object" string="Submit to Verify"
+                    class="oe_highlight" states="draft"/>
+                  <button name="action_verify" type="object" string="Verify"
+                    class="oe_highlight" states="waiting_to_verify"/>
+                  <button name="action_request_approval" type="object" string="Request Approval"
+                    class="oe_highlight" states="verified"/>
+                  <button name="action_approve" type="object" string="Approve"
+                    class="oe_highlight" states="waiting_for_approval"/>
+                  <button name="action_cancel" type="object" string="Cancel"
+                    states="draft,waiting_to_verify,verified,waiting_for_approval"/>
+                  <button name="action_send_notice_to_proceed" type="object" string="Send Notice to Proceed/Letter of Award"
+                    class="oe_highlight" attrs="{'invisible': ['|',('state', '!=', 'approved'),('notice_to_proceed_sent','=',True)]}"/>
+                  <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
+              </header>
+              <sheet>
+                <div class="oe_button_box" name="button_box">
+                  <button class="oe_stat_button" name="action_view_company_allocation" type="object" icon="fa-sitemap">
+                      <field string="Allocation" name="company_allocation_count" widget="statinfo"/>
+                  </button>
+                </div>
+                <div class="o_td_label">
+                    <label for="name" string="Contract"/>
+                </div>
+                <div>
+                  <h1>
+                    <field name="name"/>
+                  </h1>
+                </div>
+                <group>
+                  <group>
+                    <field name="ref_no" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    <field name="partner_id" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    <field name="contract_agreement_name" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    <field name="contract_date_created" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    <field name="purchasing_officer" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                  </group>
+                  <group>
+                    <field name="company_id" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    <field name="start_date" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    <field name="end_date" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    <field name="total_con_agreement_amt" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    <field name="total_comp_allocation" invisible="1"/>
+                    <field name="notice_to_proceed_sent" invisible="1"/>
+                    <label for="contract_progress" class="oe_inline"/>
+                    <div>
+                      <field name="contract_progress" class="oe_inline" readonly="1" force_save="1"/><span>%%</span>
+                    </div>
+                  </group>
+                </group>
+                <notebook>
+                  <page name="contract_agreement" string="Contract/Agreement">
+                    <group>
+                      <group>
+                        <label for="created_by" class="oe_inline"/>
+                        <div>
+                          <field name="created_by" class="oe_inline" force_save="1"/>
+                          <![CDATA[ &nbsp; ]]>
+                          <field name="created_date" class="oe_inline" force_save="1"/>
+                        </div>
+                        <label for="verified_by" />
+                        <div>
+                          <field name="verified_by" class="oe_inline" force_save="1"/>
+                          <![CDATA[ &nbsp; ]]>
+                          <field name="verified_date" class="oe_inline" force_save="1"/>
+                        </div>
+                        <label for="approved_by" />
+                        <div>
+                          <field name="approved_by" class="oe_inline" force_save="1"/>
+                          <![CDATA[ &nbsp; ]]>
+                          <field name="approved_date" class="oe_inline" force_save="1"/>
+                        </div>
+                      </group>
+                    </group>
+                  </page>
+                  <page name="inclusion" string="Inclusion">
+                    <field name="inclusion_line" no_label="1" widget="one2many" mode="tree">
+                      <tree string="Inclusion Lines" editable="bottom">
+                        <field name="product_id"/>
+                        <field name="quantity"/>
+                        <field name="price"/>
+                        <field name="subtotal" sum="Total"/>
+                      </tree>
+                    </field>
+                  </page>
+                  <page name="po_associated" string="PO Associated">
+                    <field name="po_line" no_label="1" widget="one2many" mode="tree">
+                      <tree string="PO Associated Lines" editable="bottom">
+                        <field name="company_id"/>
+                        <field name="name" string="PO No."/>
+                        <field name="date_order"/>
+                        <field name="sap_delivery_status"/>
+                        <field name="amount_untaxed"/>
+                        <field name="amount_tax"/>
+                        <field name="amount_total"/>
+                        <field name="state"/>
+                      </tree>
+                    </field>
+                  </page>
+                </notebook>
+              </sheet>
+              <div class="oe_chatter">
+                  <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                  <field name="activity_ids" widget="mail_activity"/>
+                  <field name="message_ids" widget="mail_thread"/>
+              </div>
+            </form>
+          </field>
+      </record>
+
+      <record id="contracts_and_agreements_tree" model="ir.ui.view">
+          <field name="name">contracts.and.agreements.view.tree</field>
+          <field name="model">contracts.and.agreements</field>
+          <field name="arch" type="xml">
+              <tree string="Contracts and Agreements">
+                  <field name="name"/>
+                  <field name="ref_no"/>
+                  <field name="partner_id"/>
+                  <field name="contract_agreement_name"/>
+                  <field name="contract_date_created" optional="hide"/>
+                  <field name="company_id"/>
+                  <field name="start_date"/>
+                  <field name="end_date"/>
+                  <field name="purchasing_officer"/>
+                  <field name="state"/>
+                  <field name="total_con_agreement_amt" optional="hide"/>
+                  <field name="contract_progress" string="Progress"/>
+              </tree>
+          </field>
+      </record>
+
+      <record model="ir.ui.view" id="contracts_and_agreements_pivot">
+          <field name="name">contracts.and.agreements.pivot</field>
+          <field name="model">contracts.and.agreements</field>
+          <field name="arch" type="xml">
+              <pivot string="Contracts and Agreements">
+                  <field name="partner_id" type="row"/>
+                  <field name="total_con_agreement_amt" type="measure"/>
+              </pivot>
+          </field>
+      </record>
+
+      <record id="contracts_and_agreements_action" model="ir.actions.act_window">
+          <field name="name">Contracts and Agreements</field>
+          <field name="type">ir.actions.act_window</field>
+          <field name="res_model">contracts.and.agreements</field>
+          <field name="view_mode">tree,form,pivot</field>
+          <field name="view_id" ref="contracts_and_agreements_tree"/>
+          <field name="domain">[]</field>
+          <field name="context">{}</field>
+          <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+              Create a contracts and agreements.
+            </p>
+          </field>
+      </record>
+
+      <record id="contract_purchase_order_form" model="ir.ui.view">
+          <field name="name">contract.purchase.order.view.form</field>
+          <field name="model">purchase.order</field>
+          <field name="inherit_id" ref="admin_purchase_order.admin_purchase_order_form" />
+          <field name="arch" type="xml">
+            <field name="sap_delivery_status" position="after">
+              <field name="contracts_agreement"/>
+            </field>
+          </field>
+      </record>
+
+      <menuitem action="contracts_and_agreements_action" id="menu_contracts_and_agreements" parent="purchase.menu_procurement_management" sequence="20"/>
+
+    </data>
+</odoo>

@@ -16,6 +16,7 @@
     'data': [
         'security/ir.model.access.csv',
         'data/scheduler_data.xml',
+        'wizard/link_vendor_item_to_product.xml',
         'views/res_partner.xml',
     ],
     'installable': True,

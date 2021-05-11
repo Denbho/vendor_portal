@@ -13,6 +13,7 @@
         'purchase',
         ],
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'data/email_templates.xml',
         'wizard/select_rfq_vendor.xml',

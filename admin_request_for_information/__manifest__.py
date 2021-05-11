@@ -14,6 +14,7 @@
         'admin_purchase_requisition',
     ],
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/request_for_information.xml'
     ],

@@ -18,7 +18,7 @@
           <field name="model">purchase.requisition.material.details</field>
           <field name="inherit_id" ref="admin_purchase_requisition.purchase_requisition_material_details_form"/>
           <field name="arch" type="xml">
-            <field name="product_uom" position="after">
+            <field name="company_id" position="after">
               <field name="bid_id" readonly="1"/>
             </field>
           </field>
