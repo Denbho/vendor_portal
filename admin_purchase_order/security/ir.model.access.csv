@@ -5,3 +5,4 @@ access_po_delivery_product_line,po_delivery_product_line,model_po_delivery_produ
 access_po_invoices_and_payments_product_line,po_invoices_and_payments_product_line,model_po_invoices_and_payments_product_line,,1,1,1,1
 access_admin_invoice_payment,admin_invoice_payment,model_admin_invoice_payment,,1,1,1,1
 access_admin_sales_invoice,admin_sales_invoice,model_admin_sales_invoice,,1,1,1,1
+access_admin_po_document_type,admin_po_document_type,model_admin_po_document_type,,1,1,1,1

@@ -15,6 +15,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/invoice_delivery.xml',
+        'views/admin_po_document_type.xml',
         'views/purchase_order_view.xml',
     ],
     'installable': True,

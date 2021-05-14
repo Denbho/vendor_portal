@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="po_document_type_form" model="ir.ui.view">
+            <field name="name">admin.po.document.type.form</field>
+            <field name="model">admin.po.document.type</field>
+            <field name="arch" type="xml">
+                <form string="PO Document Type Form">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                            <div name="code">
+                                <label for="code" class="oe_inline"/>
+                                <field name="code" class="oe_inline oe_input_align" required="1"/>
+                            </div>
+                            <div name="company_id">
+                                <label for="company_id" class="oe_inline"/>
+                                [<field name="company_code" class="oe_inline"/>]
+                                <field name="company_id" class="oe_inline oe_input_align"
+                                       groups="base.group_multi_company" required="1"
+                                       options="{'no_create': True}"/>
+                            </div>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="po_document_type_tree" model="ir.ui.view">
+            <field name="name">admin.po.document.type.tree</field>
+            <field name="model">admin.po.document.type</field>
+            <field name="arch" type="xml">
+                <tree string="PO Document Type Tree">
+                    <field name="active" invisible="1"/>
+                    <field name="complete_name" string="PO Document Type"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="po_document_type_action" model="ir.actions.act_window">
+            <field name="name">PO Document Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">admin.po.document.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="po_document_type_tree"/>
+        </record>
+
+        <menuitem id="menu_po_document_type" parent="purchase.menu_purchase_config" action="po_document_type_action"
+                  sequence="6"/>
+
+    </data>
+</odoo>

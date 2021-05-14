@@ -33,8 +33,10 @@ class AdminPurchaseRequisition(models.Model):
     name = fields.Char(string='PR No.', required=True, copy=False, default=lambda self: _('New'))
     company_id = fields.Many2one('res.company', 'Company', required=True, index=True,
                                  default=lambda self: self.env.company)
-    pr_doc_type_id = fields.Many2one('pr.document.type', 'PR Document Type')
+    pr_doc_type_id = fields.Many2one('pr.document.type', 'PR Document Type', domain="[('company_id','=',company_id)]")
+    pr_doc_type_code = fields.Char(string='PR Document Type Code')
     warehouse_id = fields.Many2one('location.plant', 'Plant', domain="[('company_id','=',company_id)]")
+    plant_code = fields.Char(string='Plant Code')
     target_delivery_date = fields.Date(string="Target Delivery Date")
     pr_line = fields.One2many('purchase.requisition.material.details', 'request_id', string='Material Details Lines',
                               copy=True, auto_join=True)
@@ -46,6 +48,23 @@ class AdminPurchaseRequisition(models.Model):
                              copy=False,
                              default='unreleased')
     material_details_count = fields.Integer(compute='_compute_material_details_count', string='Material Details Count')
+
+    @api.onchange('warehouse_id')
+    def onchange_plant(self):
+        if self.warehouse_id:
+            self.plant_code = self.warehouse_id.code
+
+    @api.onchange('pr_doc_type_id')
+    def onchange_pr_doc_type_id(self):
+        if self.pr_doc_type_id:
+            self.pr_doc_type_code = self.pr_doc_type_id.code
+
+    @api.model
+    def create(self, vals):
+        res = super(AdminPurchaseRequisition,self).create(vals)
+        res.onchange_plant()
+        res.onchange_pr_doc_type_id()
+        return res
 
     def _compute_material_details_count(self):
         for record in self:
@@ -109,7 +128,10 @@ class PurchaseRequisitionMaterialDetails(models.Model):
     release_indicator = fields.Selection(selection=_RELEASE_INDICATOR, string='Release Indicator', default='unreleased')
     cost_center_id = fields.Many2one('account.analytic.account', string='Cost Center')
     warehouse_id = fields.Many2one('location.plant', 'Plant', domain="[('company_id','=',company_id)]")
+    plant_code = fields.Char(string='Plant Code')
     location = fields.Many2one('stock.location', string='Storage Location', domain="[('company_id','=',company_id), ('plant_id', '=', warehouse_id)]")
+    location_code = fields.Char(string='Storage Location Code')
+    target_delivery_date = fields.Date(string="Target Delivery Date")
     requisitioner_id = fields.Many2one('purchase.requisitioner', string='Requisitioner')
     pr_releaser_id = fields.Many2one('res.partner', string='PR Releaser')
     asset_code = fields.Char(string='Asset Code')
@@ -122,6 +144,23 @@ class PurchaseRequisitionMaterialDetails(models.Model):
     rfq_id = fields.Many2one('admin.request.for.quotation', string='RFQ No.')
     rfq_line_id = fields.Many2one('admin.request.for.quotation.line', string='RFQ Line')
     state = fields.Selection(selection=[('pending', 'Pending'), ('done', 'Done')], string='Status', default='pending')
+
+    @api.onchange('warehouse_id')
+    def onchange_plant(self):
+        if self.warehouse_id:
+            self.plant_code = self.warehouse_id.code
+
+    @api.onchange('location')
+    def onchange_location(self):
+        if self.location:
+            self.location_code = self.location.code
+
+    @api.model
+    def create(self, vals):
+        res = super(PurchaseRequisitionMaterialDetails,self).create(vals)
+        res.onchange_plant()
+        res.onchange_location()
+        return res
 
     @api.onchange('product_id')
     def product_id_change(self):
@@ -174,15 +213,6 @@ class PurchaseRequisitioner(models.Model):
 class PurchasingGroup(models.Model):
     _name = 'purchasing.group'
     _description = 'Purchasing Group'
-    _order = 'name'
-
-    name = fields.Char(string='Name', required=True)
-    code = fields.Char(string='Code', required=True)
-
-
-class PRDocumentType(models.Model):
-    _name = 'pr.document.type'
-    _description = 'PR Document Type'
     _order = 'name'
 
     name = fields.Char(string='Name', required=True)

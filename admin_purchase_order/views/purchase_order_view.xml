@@ -48,6 +48,8 @@
                     </button>
                 </div>
                 <field name="company_id" position="after">
+                    <field name="po_doc_type_id"/>
+                    <field name="po_doc_type_code"/>
                     <field name="sap_delivery_status"/>
                 </field>
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="attributes">

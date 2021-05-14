@@ -17,12 +17,12 @@ class LocationPlant(models.Model):
             res['barcode'] = res['complete_name']
         return res
 
-    name = fields.Char('Location Name', required=True)
-    complete_name = fields.Char("Full Location Name", compute='_compute_complete_name', store=True)
+    name = fields.Char('Plant Name', required=True)
+    complete_name = fields.Char("Full Plant Name", compute='_compute_complete_name', store=True)
     active = fields.Boolean('Active', default=True,
-                            help="By unchecking the active field, you may hide a location without deleting it.")
+                            help="By unchecking the active field, you may hide a plant without deleting it.")
     company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company, index=True,
-                                 help='Let this field empty if this location is shared between companies')
+                                 help='Let this field empty if this plant is shared between companies')
     company_code = fields.Char(string="Company Code")
     barcode = fields.Char('Barcode', copy=False)
     code = fields.Char(string="Code", copy=False)
@@ -64,6 +64,7 @@ class LocationPlant(models.Model):
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
         """ search full name and barcode """
         args = args or []
+        domain = []
         if operator == 'ilike' and not (name or '').strip():
             domain = []
         else:

@@ -71,11 +71,27 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_admin_vendor_rfq_search">
+            <field name="name">admin.vendor.rfq.search</field>
+            <field name="model">admin.vendor.rfq</field>
+            <field name="arch" type="xml">
+                <search string="RFQ Mails">
+                    <field name="partner_id"/>
+                    <field name="rfq_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Vendor" name="partner_id" context="{'group_by': 'partner_id'}"/>
+                        <filter string="RFQ" name="rfq_id" context="{'group_by': 'rfq_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="admin_vendor_rfq_open_action" model="ir.actions.act_window">
             <field name="name">RFQ Mails</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">admin.vendor.rfq</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_admin_vendor_rfq_search"/>
              <field name="domain">[('rfq_id', '=', active_id)]</field>
         </record>
 
@@ -266,11 +282,37 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_admin_request_for_quotation_search">
+            <field name="name">admin.request.for.quotation.search</field>
+            <field name="model">admin.request.for.quotation</field>
+            <field name="arch" type="xml">
+                <search string="Request For Quotation">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="company_id"/>
+                    <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]" help="Pending RFQ"/>
+                    <filter string="In Progress" name="sent" domain="[('state', '=', 'sent')]" help="In Progress RFQ"/>
+                    <separator/>
+                    <filter string="Required Delivery Date" name="est_del_date" date="est_del_date"/>
+                    <filter string="RFQ Closing Date" name="close_date" date="close_date"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Purchasing Officer" name="group_user_id" context="{'group_by': 'user_id'}"/>
+                        <filter string="Company" name="group_company_id" context="{'group_by': 'company_id'}"/>
+                        <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                        <filter string="Created Date" name="group_create_date" domain="[]" context="{'group_by': 'create_date'}"/>
+                        <filter string="Required Delivery Date" name="group_est_del_date" domain="[]" context="{'group_by': 'est_del_date'}"/>
+                        <filter string="RFQ Closing Date" name="group_close_date" domain="[]" context="{'group_by': 'close_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="admin_request_for_quotation_action" model="ir.actions.act_window">
             <field name="name">Request For Quotation</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">admin.request.for.quotation</field>
             <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_admin_request_for_quotation_search"/>
         </record>
 
         <menuitem id="admin_request_for_quotation_action_menu" name="RFQ Details"

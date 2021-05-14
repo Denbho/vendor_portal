@@ -322,6 +322,7 @@
                     <field name="name"/>
                     <field name="project_name"/>
                     <field name="project_location" optional="hide"/>
+                    <field name="wbs_element" optional="hide"/>
                     <field name="scope_of_work"/>
                     <field name="scope_of_work_remark" widget="html" optional="hide"/>
                     <field name="purchasing_officer"/>
@@ -353,14 +354,46 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_purchase_bid_search">
+            <field name="name">purchase.bid.search</field>
+            <field name="model">purchase.bid</field>
+            <field name="arch" type="xml">
+                <search string="Bidding Details">
+                    <field name="name"/>
+                    <field name="project_name"/>
+                    <field name="project_location"/>
+                    <field name="wbs_element"/>
+                    <field name="scope_of_work"/>
+                    <field name="purchasing_officer"/>
+                    <field name="company_id"/>
+                    <filter string="Pre-Bidding" name="pre_bidding" domain="[('state', '=', 'pre_bidding')]"/>
+                    <filter string="Post-Bidding" name="post_bidding" domain="[('state', '=', 'post_bidding')]"/>
+                    <filter string="Bid Selection" name="bid_selection" domain="[('state', '=', 'bid_selection')]"/>
+                    <filter string="Halted" name="halted" domain="[('state', '=', 'halted')]"/>
+                    <separator/>
+                    <filter string="Bid Opening Date" name="bid_opening_date" date="bid_opening_date"/>
+                    <filter string="Bid Closing Date" name="bid_closing_date" date="bid_closing_date"/>
+                    <separator/>
+                    <filter string="Date Halted" name="date_halted" date="date_halted"/>
+                    <filter string="Date Resume" name="date_resume" date="date_resume"/>
+                    <separator/>
+                    <filter string="Document Deadline of Submission" name="deadline_of_submission" date="deadline_of_submission"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Purchasing Officer" name="purchasing_officer" context="{'group_by': 'purchasing_officer'}"/>
+                        <filter string="Company" name="group_company_id" context="{'group_by': 'company_id'}"/>
+                        <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="pr_bid_form_action" model="ir.actions.act_window">
             <field name="name">Bidding Details</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">purchase.bid</field>
             <field name="view_mode">tree,form,pivot</field>
             <field name="view_id" ref="pr_bid_view_tree"/>
-            <field name="domain">[]</field>
-            <field name="context">{}</field>
+            <field name="search_view_id" ref="view_purchase_bid_search"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create a bid.
@@ -679,14 +712,36 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_purchase_bid_vendor_search">
+            <field name="name">purchase.bid.vendor.search</field>
+            <field name="model">purchase.bid.vendor</field>
+            <field name="arch" type="xml">
+                <search string="Bidders Details">
+                    <field name="partner_id"/>
+                    <field name="contact_id"/>
+                    <field name="bid_id"/>
+                    <filter string="Draft Invitation" name="invitation_draft" domain="[('invitation', '=', 'draft')]"/>
+                    <filter string="Sent Invitation" name="invitation_sent" domain="[('invitation', '=', 'sent')]"/>
+                    <separator/>
+                    <filter string="Pending Acceptance" name="pending_acceptance" domain="[('acceptance', '=', 'pending')]"/>
+                    <separator/>
+                    <filter string="Deadline of Submission" name="deadline_of_submission" date="deadline_of_submission"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Vendor" name="grp_partner_id" context="{'group_by': 'partner_id'}"/>
+                        <filter string="Contact Person" name="group_contact_id" context="{'group_by': 'contact_id'}"/>
+                        <filter string="Bid" name="group_state" context="{'group_by': 'bid_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="purchase_bid_vendor_action" model="ir.actions.act_window">
             <field name="name">Bidders Details</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">purchase.bid.vendor</field>
             <field name="view_mode">tree,form,pivot</field>
             <field name="view_id" ref="purchase_bid_vendor_tree"/>
-            <field name="domain">[]</field>
-            <field name="context">{}</field>
+            <field name="search_view_id" ref="view_purchase_bid_vendor_search"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create a bid vendor.

@@ -15,6 +15,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'views/stock_location.xml',
+        'views/pr_document_type.xml',
         'views/admin_purchase_requisition_view.xml',
         'views/rfq_view.xml',
     ],

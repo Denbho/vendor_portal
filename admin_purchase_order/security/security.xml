@@ -5,19 +5,19 @@
       <record id="dr_gr_by_company_rule" model="ir.rule">
           <field name="name">DRs/GRS: By Company</field>
           <field ref="admin_purchase_order.model_po_delivery_line" name="model_id"/>
-          <field name="domain_force">[('company_id','in',[line.id for line in user.company_ids])]</field>
+          <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
       </record>
 
       <record id="vendor_si_by_company_rule" model="ir.rule">
           <field name="name">Vendor SI: By Company</field>
           <field ref="admin_purchase_order.model_admin_sales_invoice" name="model_id"/>
-          <field name="domain_force">[('company_id','in',[line.id for line in user.company_ids])]</field>
+          <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
       </record>
 
       <record id="payment_release_by_company_rule" model="ir.rule">
           <field name="name">Payment Release: By Company</field>
           <field ref="admin_purchase_order.model_admin_invoice_payment" name="model_id"/>
-          <field name="domain_force">[('company_id','in',[line.id for line in user.company_ids])]</field>
+          <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
       </record>
 
     </data>
