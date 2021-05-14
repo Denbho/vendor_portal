@@ -21,6 +21,19 @@ class PurchaseOrder(models.Model):
     delivery_count = fields.Integer(compute="_compute_dr_count")
     vendor_si_count = fields.Integer(compute="_compute_vendor_si_count")
     vendor_payment_count = fields.Integer(compute="_compute_vendor_payment_count")
+    po_doc_type_id = fields.Many2one('admin.po.document.type', string='PO Document Type', domain="[('company_id','=',company_id)]")
+    po_doc_type_code = fields.Char(string='PO Document Type Code')
+
+    @api.onchange('po_doc_type_id')
+    def onchange_po_doc_type_id(self):
+        if self.po_doc_type_id:
+            self.po_doc_type_code = self.po_doc_type_id.code
+
+    @api.model
+    def create(self, vals):
+        res = super(PurchaseOrder,self).create(vals)
+        res.onchange_po_doc_type_id()
+        return res
 
     def _compute_vendor_payment_count(self):
         for r in self:

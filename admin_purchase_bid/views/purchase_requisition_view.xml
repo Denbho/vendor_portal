@@ -7,7 +7,7 @@
           <field name="model">admin.purchase.requisition</field>
           <field name="inherit_id" ref="admin_purchase_requisition.admin_purchase_requisition_form"/>
           <field name="arch" type="xml">
-            <xpath expr="//field[@name='pr_line']/tree/field[@name='internal_order']" position="after">
+            <xpath expr="//field[@name='pr_line']/tree/field[@name='target_delivery_date']" position="after">
               <field name="bid_id" optional="hide"/>
             </xpath>
           </field>
@@ -18,7 +18,7 @@
           <field name="model">purchase.requisition.material.details</field>
           <field name="inherit_id" ref="admin_purchase_requisition.purchase_requisition_material_details_form"/>
           <field name="arch" type="xml">
-            <field name="company_id" position="after">
+            <field name="target_delivery_date" position="after">
               <field name="bid_id" readonly="1"/>
             </field>
           </field>

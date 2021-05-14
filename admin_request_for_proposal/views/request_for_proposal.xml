@@ -290,11 +290,36 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_admin_request_for_proposal_search">
+            <field name="name">admin.request.for.proposals.search</field>
+            <field name="model">admin.request.for.proposals</field>
+            <field name="arch" type="xml">
+                <search string="Request For Proposal Details">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="company_id"/>
+                    <field name="vendor_ids"/>
+                    <filter string="Waiting for Confirmation" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                    <filter string="Waiting for Verification" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                    <filter string="Waiting for Approval" name="verified" domain="[('state', '=', 'verified')]"/>
+                    <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+                    <separator/>
+                    <filter string="Required Delivery Date" name="est_del_date" date="est_del_date"/>
+                    <filter string="Due Date" name="due_date" date="due_date"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Purchasing Officer" name="user_id" context="{'group_by': 'user_id'}"/>
+                        <filter string="Company" name="company_id" context="{'group_by': 'company_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="admin_request_for_proposal_action" model="ir.actions.act_window">
             <field name="name">Request For Proposal Details</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">admin.request.for.proposals</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_admin_request_for_proposal_search"/>
         </record>
 
         <menuitem id="admin_request_for_proposal_action_menu" name="RFP Details"
