@@ -61,7 +61,7 @@
             <field name="sequence">1</field>
             <field name="active">1</field>
             <field name="with_predecessor">0</field>
-            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_uncontracted"/>
+            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_reserved"/>
         </record>
 
         <record id="sale_sub_stage_for_compliance" model="property.sale.sub.status">
@@ -69,7 +69,7 @@
             <field name="sequence">2</field>
             <field name="active">1</field>
             <field name="predecessor_stage_id" ref="property_admin_monitoring.sale_sub_stage_ongoing_assessment"/>
-            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_uncontracted"/>
+            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_reserved"/>
         </record>
 
         <record id="sale_sub_stage_qualified" model="property.sale.sub.status">
@@ -78,7 +78,7 @@
             <field name="active">1</field>
             <field name="trigger_admin_qualified">1</field>
             <field name="predecessor_stage_id" ref="property_admin_monitoring.sale_sub_stage_for_compliance"/>
-            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_uncontracted"/>
+            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_reserved"/>
             <field name="with_successor">0</field>
         </record>
 
@@ -86,7 +86,7 @@
             <field name="name">Not Qualified</field>
             <field name="sequence">4</field>
             <field name="active">1</field>
-            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_uncontracted"/>
+            <field name="sub_parent_id" ref="property_admin_monitoring.sale_stage_reserved"/>
             <field name="with_successor">0</field>
             <field name="with_predecessor">0</field>
             <field name="canceled">1</field>

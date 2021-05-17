@@ -292,6 +292,11 @@ class PropertyAdminSale(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Property Admin Sales Monitoring'
 
+    _sql_constraints = [
+        ('so_number_be_code_key', 'unique(so_number, company_code)',
+         "Duplicate of SO Number is not allowed in the same company!")
+    ]
+
     @api.model
     def _get_default_stage(self):
         stage = self.env['property.sale.status'].search([('active', '=', True)], order='sequence asc')
@@ -299,16 +304,16 @@ class PropertyAdminSale(models.Model):
             raise ValidationError(_("Please setup sales stages first"))
         return stage[0].id
 
-    @api.model
-    def _get_default_sub_stage(self):
-        stage = self.env['property.sale.status'].search([('active', '=', True)], order='sequence asc')
-        if not stage[:1]:
-            raise ValidationError(_("Please setup sales stages first"))
-        sub_stage = self.env['property.sale.sub.status'].search(
-            [('active', '=', True), ('sub_parent_id', '=', stage[0].id)], order='sequence asc')
-        if not sub_stage[:1]:
-            return False
-        return sub_stage[0].id
+    # @api.model
+    # def _get_default_sub_stage(self):
+    #     stage = self.env['property.sale.status'].search([('active', '=', True)], order='sequence asc')
+    #     if not stage[:1]:
+    #         raise ValidationError(_("Please setup sales stages first"))
+    #     sub_stage = self.env['property.sale.sub.status'].search(
+    #         [('active', '=', True), ('sub_parent_id', '=', stage[0].id)], order='sequence asc')
+    #     if not sub_stage[:1]:
+    #         return False
+    #     return sub_stage[0].id
 
     @api.depends('so_number', 'property_id', 'property_id.block_lot', 'property_id.su_number')
     def _get_display_name(self):
@@ -348,8 +353,7 @@ class PropertyAdminSale(models.Model):
                                          force_save=True)
     stage_id = fields.Many2one('property.sale.status', string="Status", group_expand='_expand_stages',
                                default=_get_default_stage, track_visibility="always")
-    sub_stage_id = fields.Many2one('property.sale.sub.status', string="Sub-Status", group_expand='_expand_sub_stages',
-                                   default=_get_default_sub_stage, track_visibility="always")
+    sub_stage_id = fields.Many2one('property.sale.sub.status', string="Sub-Status", track_visibility="always")
     account_officer_user_id = fields.Many2one('res.users', string="Account Officer",
                                               help="Sales Admin Account Officer Assigned", track_visibility="always")
     ao_assigned_date = fields.Date(string="Account Officer Assigned Date", track_visibility="always")
@@ -411,6 +415,8 @@ class PropertyAdminSale(models.Model):
     so_number = fields.Char(string="SO Number", required=True, track_visibility="always", index=True)
     so_date = fields.Date(string="SO Date", required=True, track_visibility="always")
     reservation_date = fields.Date(string="Original RS Date", track_visibility="always", help="Reservation Date")
+    recontracted_one = fields.Boolean(string="Is Re-contracted (1)", track_visibility="always")
+    recontracted_two = fields.Boolean(string="Is Re-contracted (2)", track_visibility="always")
     recontract_rs_date = fields.Date(string="Re-contract RS Date 1", track_visibility="always")
     recontracted_so_number = fields.Char(string="Re-contract SO 1", track_visibility="always")
     recontract_rs_date2 = fields.Date(string="Re-contract RS Date 2", track_visibility="always")
@@ -422,9 +428,8 @@ class PropertyAdminSale(models.Model):
     buyback_date = fields.Date(string="Reactivated Date", track_visibility="always")
     buyback_reason = fields.Text(string="Reactivated Reason", track_visibility="always")
     partner_id = fields.Many2one('res.partner', string="Customer", track_visibility="always")
-    customer_number = fields.Char(string="CN #", required=True)
-    employment_status_id = fields.Many2one('res.partner.employment.status', related="partner_id.employment_status_id",
-                                           string="Employment Status")
+    customer_number = fields.Char(string="Customer Number", required=True)
+    employment_status_id = fields.Many2one('res.partner.employment.status', string="Employment Type", track_visibility="always")
     company_id = fields.Many2one('res.company', 'Company', index=True)
     company_code = fields.Char(string="Company Code")
     currency_id = fields.Many2one('res.currency', string="Currency", related="company_id.currency_id")
@@ -438,14 +443,16 @@ class PropertyAdminSale(models.Model):
     su_number = fields.Char(string="SU Number", required=True, track_visibility="always")
     block_lot = fields.Char(string="Block-Lot", required=True, track_visibility="always")
     property_type = fields.Selection([
-        ('House and Lot', 'House and Lot'),
+        ('Combo Condo Unit', 'Combo Condo Unit'),
+        ('Condo Parking', 'Condo Parking'),
+        ('Condo', 'Condo Only'),
+        ('Combo House & Lot', 'Combo House & Lot'),
         ('House & Lot', 'House & Lot'),
         ('House Only', 'House Only'),
-        ('Condo', 'Condo Unit'),
-        ('Parking Condo', 'Condo and Parking'),
         ('Lot Only', 'Lot Only'),
-        ('Parking Only', 'Parking Only')],
-        string="Usage Type", related="house_model_id.property_type", store=True)
+        ('Combo Lot Only', 'Combo Lot Only'),
+        ('unspecified', 'Unspecified')],
+        string="Usage Type", defualt="unspecified", track_visibility="always")
     property_unit_state = fields.Selection([
         ('Ongoing', 'Ongoing'),
         ('NRFO', 'NRFO'),
@@ -456,39 +463,29 @@ class PropertyAdminSale(models.Model):
     model_type_id = fields.Many2one("property.model.type", string="House Class",
                                     store=True, related="property_id.model_type_id")
     house_model_description = fields.Text(string="House Model Description", track_visibility="always")
-    model_unit_type_id = fields.Many2one("property.model.unit.type", string="Unit Type",
+    model_unit_type_id = fields.Many2one("property.model.unit.type", string="Unit Type (Depricated)",
                                          store=True, related="property_id.model_unit_type_id")
+    house_series = fields.Char(string="House Series", store=True, related="property_id.unit_type")
+    unit_type = fields.Char(string="Unit Type", store=True, related="property_id.unit_type")
     category = fields.Selection([('economic', 'Economic'), ('socialized', 'Socialized')], string="Series",
                                 store=True, related="property_id.category")
-    lot_area_price = fields.Monetary(string="Lot Area Price", compute="_get_contract_price",
-                                     inverse="_inverse_get_contract_price", store=True)
-    floor_area_price = fields.Monetary(string="Floor Area Price", compute="_get_contract_price",
-                                       inverse="_inverse_get_contract_price", store=True)
-    floor_area = fields.Float(string="Floor Area", compute="_get_contract_price",
-                              inverse="_inverse_get_contract_price", store=True)
-    lot_area = fields.Float(string="Lot Area", compute="_get_contract_price",
-                            inverse="_inverse_get_contract_price", store=True)
-    house_price = fields.Monetary(string="House Price", compute="_get_contract_price",
-                                  inverse="_inverse_get_contract_price", store=True)
-    house_repair_price = fields.Monetary(string="House Repair Price", compute="_get_contract_price",
-                                         inverse="_inverse_get_contract_price", store=True)
-    parking_price = fields.Monetary(string="Parking Price", compute="_get_contract_price",
-                                    inverse="_inverse_get_contract_price", store=True)
-    lot_price = fields.Monetary(string="Lot Price", compute="_get_contract_price",
-                                inverse="_inverse_get_contract_price", store=True)
-    vat = fields.Monetary(string="Tax Amount", compute="_get_contract_price", inverse="_inverse_get_contract_price",
-                          store=True)
-    miscellaneous_charge = fields.Float(string="Miscellaneous Charge", compute="_get_contract_price",
-                                        inverse="_inverse_get_contract_price", store=True)
-    miscellaneous_value = fields.Monetary(string="MCC2", help="Miscellaneous Absolute Value",
-                                          compute="_get_contract_price", inverse="_inverse_get_contract_price",
-                                          store=True)
-    miscellaneous_amount = fields.Monetary(string="Miscellaneous Amount", compute="_get_contract_price",
-                                           inverse="_inverse_get_contract_price", store=True)
-    ntcp = fields.Monetary(string="NTCP", help="Total Net Contract Price", compute="_get_contract_price",
-                           inverse="_inverse_get_contract_price", store=True)
-    tcp = fields.Monetary(string="TCP", help="Total Contract Price", compute="_get_contract_price",
-                          inverse="_inverse_get_contract_price", store=True)
+    lot_area_price = fields.Monetary(string="Lot Area Price", track_visibility="always")
+    floor_area_price = fields.Monetary(string="Floor Area Price", track_visibility="always")
+    floor_area = fields.Float(string="Floor Area", track_visibility="always")
+    lot_area = fields.Float(string="Lot Area", track_visibility="always")
+    house_price = fields.Monetary(string="House Price", track_visibility="always")
+    house_repair_price = fields.Monetary(string="House Repair Price", track_visibility="always")
+    parking_price = fields.Monetary(string="Parking Price", track_visibility="always")
+    lot_price = fields.Monetary(string="Lot Price", track_visibility="always")
+    vat = fields.Monetary(string="Tax Amount", track_visibility="always")
+    miscellaneous_charge = fields.Float(string="Miscellaneous Charge", track_visibility="always")
+    condo_price = fields.Monetary(string="Condo Price", track_visibility="always")
+    premium_price = fields.Monetary(string="Premium Price", track_visibility="always")
+
+    miscellaneous_value = fields.Monetary(string="MCC2", help="Miscellaneous Absolute Value", track_visibility="always")
+    miscellaneous_amount = fields.Monetary(string="Miscellaneous Amount", track_visibility="always")
+    ntcp = fields.Monetary(string="NTCP", help="Total Net Contract Price", track_visibility="always")
+    tcp = fields.Monetary(string="TCP", help="Total Contract Price", track_visibility="always")
     price_range_id = fields.Many2one('property.price.range', string="TCP Price Range", compute="_get_price_range",
                                      store=True)
     sale_document_requirement_ids = fields.Many2many('property.sale.required.document', 'property_sale_document_rel',
@@ -505,6 +502,7 @@ class PropertyAdminSale(models.Model):
     stage_document_list = fields.Html(compute="_get_stage_document_list")
     dp_percent = fields.Float(string="DP Percent")
     dp_amount = fields.Monetary(string="Down Payment Amount")
+    reservation_fee = fields.Monetary(string="Reservation Fee")
     # dp_spot_cash = fields.Monetary(string="DP Spot Cash")
     # dp_due = fields.Monetary(string="DP Due", help="DP Amount less the DP Spot Cash, Reservation, and Total Discount")
     dp_monthly = fields.Monetary(string="Monthly DP")
@@ -599,7 +597,7 @@ class PropertyAdminSale(models.Model):
     sales_manager_unique_number = fields.Char(string="Sales Manager",
                                               help="Unique Number assigned to Sales Manager contact info.")
 
-    agent_position = fields.Char(string="Agent Position", track_visibility="always")
+    agent_position = fields.Char(string="Partner Function", track_visibility="always")
     agent_partner_id = fields.Many2one('res.partner', string="Agent",
                                        track_visibility="always", store=True,
                                        compute='_get_agent_number',
@@ -1130,7 +1128,7 @@ class PropertyAdminSale(models.Model):
                             document += f"<ul>{count}. {gd.name} - (Optional))</ul>"
                         else:
                             document += f"<ul>{count}. {gd.name}</ul>"
-                    elif r.partner_id.employment_status_id and gd.employment_status_id.id == r.partner_id.employment_status_id.id:
+                    elif r.employment_status_id and gd.employment_status_id.id == r.employment_status_id.id:
                         if gd.optional_requirement:
                             document += f"<ul>{count}. {gd.name} - (Optional))</ul>"
                         else:
@@ -1141,18 +1139,18 @@ class PropertyAdminSale(models.Model):
                         for psd_document in psd.required_sale_document_requirement_ids:
                             if not psd_document.employment_status_id:
                                 if psd_document.optional_requirement:
-                                    document += f"<ul>{count}. {psd_documentname} - (Optional))</ul>"
+                                    document += f"<ul>{count}. {psd_document.name} - (Optional))</ul>"
                                 else:
                                     document += f"<ul>{count}. {psd_document.name}</ul>"
-                            elif r.partner_id.employment_status_id and psd_document.employment_status_id.id == r.partner_id.employment_status_id.id:
+                            elif r.employment_status_id and psd_document.employment_status_id.id == r.employment_status_id.id:
                                 if psd_document.optional_requirement:
-                                    document += f"<ul>{count}. {psd_documentname} - (Optional))</ul>"
+                                    document += f"<ul>{count}. {psd_document.name} - (Optional))</ul>"
                                 else:
                                     document += f"<ul>{count}. {psd_document.name}</ul>"
                     count += 1
             r.stage_document_list = document
 
-    @api.depends('be_code', 'partner_id', 'partner_id.employment_status_id', 'stage_id.project_specific_document_ids',
+    @api.depends('be_code', 'partner_id', 'employment_status_id', 'stage_id.project_specific_document_ids',
                  'stage_id.required_sale_document_requirement_ids',
                  'stage_id.project_specific_document_ids.required_sale_document_requirement_ids')
     def _get_document_requirement_list(self):
@@ -1163,14 +1161,14 @@ class PropertyAdminSale(models.Model):
                 for gd in i.required_sale_document_requirement_ids:
                     if not gd.employment_status_id:
                         documents.append(gd.id)
-                    elif r.partner_id.employment_status_id and gd.employment_status_id.id == r.partner_id.employment_status_id.id:
+                    elif r.employment_status_id and gd.employment_status_id.id == r.employment_status_id.id:
                         documents.append(gd.id)
                 for psd in i.project_specific_document_ids:
                     if psd.be_code == r.be_code:
                         for psd_document in psd.required_sale_document_requirement_ids:
                             if not psd_document.employment_status_id:
                                 documents.append(psd_document.id)
-                            elif r.partner_id.employment_status_id and psd_document.employment_status_id.id == r.partner_id.employment_status_id.id:
+                            elif r.employment_status_id and psd_document.employment_status_id.id == r.employment_status_id.id:
                                 documents.append(psd_document.id)
             r.document_requirement_list_ids = documents
 
@@ -1184,7 +1182,7 @@ class PropertyAdminSale(models.Model):
                     if not gd.employment_status_id:
                         if not gd.id in validated_doc:
                             document.append(gd.id)
-                    elif r.partner_id.employment_status_id and gd.employment_status_id.id == r.partner_id.employment_status_id.id:
+                    elif r.employment_status_id and gd.employment_status_id.id == r.employment_status_id.id:
                         if not gd.id in validated_doc:
                             document.append(gd.id)
                 for psd in r.stage_id.project_specific_document_ids:
@@ -1193,7 +1191,7 @@ class PropertyAdminSale(models.Model):
                             if not psd_document.employment_status_id:
                                 if not psd_document.id in validated_doc:
                                     document.append(psd_document.id)
-                            elif r.partner_id.employment_status_id and psd_document.employment_status_id.id == r.partner_id.employment_status_id.id:
+                            elif r.employment_status_id and psd_document.employment_status_id.id == r.employment_status_id.id:
                                 if not psd_document.id in validated_doc:
                                     document.append(psd_document.id)
             r.stage_document_requirement_list_ids = document
@@ -1212,7 +1210,7 @@ class PropertyAdminSale(models.Model):
                             if not req.employment_status_id:
                                 if req.id not in data.sale_document_requirement_ids.ids:
                                     required_doc += f"\t{req.name}\n"
-                            elif data.partner_id.employment_status_id and data.partner_id.employment_status_id.id == req.employment_status_id.id:
+                            elif data.employment_status_id and data.employment_status_id.id == req.employment_status_id.id:
                                 if req.id not in data.sale_document_requirement_ids.ids:
                                     required_doc += f"\t{req.name}\n"
                     for psd in predecessor.project_specific_document_ids:
@@ -1222,7 +1220,7 @@ class PropertyAdminSale(models.Model):
                                     if not psd_document.employment_status_id:
                                         if psd_document.id not in data.sale_document_requirement_ids.ids:
                                             required_doc += f"\t{psd_document.name}\n"
-                                    elif data.partner_id.employment_status_id and data.partner_id.employment_status_id.id == psd_document.employment_status_id.id:
+                                    elif data.employment_status_id and data.employment_status_id.id == psd_document.employment_status_id.id:
                                         if psd_document.id not in data.sale_document_requirement_ids.ids:
                                             required_doc += f"\t{psd_document.name}\n"
                     predecessor = predecessor.predecessor_stage_id
@@ -1251,24 +1249,24 @@ class PropertyAdminSale(models.Model):
         for i in self:
             continue
 
-    @api.depends('property_id')
-    def _get_contract_price(self):
-        for r in self:
-            data = r.property_id
-            r.lot_area = data.lot_area
-            r.lot_area_price = data.lot_area_price
-            r.lot_price = data.lot_price
-            r.house_price = data.house_price
-            r.house_repair_price = data.house_repair_price
-            r.parking_price = data.parking_price
-            r.floor_area = data.floor_area
-            r.floor_area_price = data.floor_area_price
-            r.miscellaneous_charge = data.miscellaneous_charge
-            r.miscellaneous_value = data.miscellaneous_value
-            r.miscellaneous_amount = data.miscellaneous_amount
-            r.vat = data.vat
-            r.ntcp = data.ntcp
-            r.tcp = data.tcp
+    # @api.depends('property_id')
+    # def _get_contract_price(self):
+    #     for r in self:
+    #         data = r.property_id
+    #         r.lot_area = data.lot_area
+    #         r.lot_area_price = data.lot_area_price
+    #         r.lot_price = data.lot_price
+    #         r.house_price = data.house_price
+    #         r.house_repair_price = data.house_repair_price
+    #         r.parking_price = data.parking_price
+    #         r.floor_area = data.floor_area
+    #         r.floor_area_price = data.floor_area_price
+    #         r.miscellaneous_charge = data.miscellaneous_charge
+    #         r.miscellaneous_value = data.miscellaneous_value
+    #         r.miscellaneous_amount = data.miscellaneous_amount
+    #         r.vat = data.vat
+    #         r.ntcp = data.ntcp
+    #         r.tcp = data.tcp
 
     def cancel_sale_account(self):
         cancel_stage = self.env['property.sale.status'].search([('canceled', '=', True)], limit=1)
@@ -1350,8 +1348,9 @@ class PropertyAdminSale(models.Model):
             sub_stage = self.env['property.sale.sub.status'].search(
                 [('active', '=', True), ('sub_parent_id', '=', vals.get('stage_id'))], order='sequence asc')
             vals['sub_stage_id'] = sub_stage[:1] and sub_stage[0].id or False
+            property_rec = self.env['property.detail'].browse(vals.get('property_id') or self.property_id.id)
             assigned_person = self.env['property.status.assigned.person'].search(
-                [('state_id', '=', vals.get('stage_id')), ('be_code', '=', self.be_code)], limit=1)
+                [('state_id', '=', vals.get('stage_id')), ('subdivision_phase_id.be_code', 'in', [property_rec.be_code])], limit=1)
             if assigned_person[:1]:
                 vals[
                     'account_officer_user_id'] = assigned_person.account_officer_user_id and assigned_person.account_officer_user_id.id or (
@@ -1429,38 +1428,56 @@ class PropertyAdminSale(models.Model):
             required_doc = ""
             if not stage.canceled and stage.predecessor_stage_id:
                 predecessor = stage.predecessor_stage_id
-                while predecessor:
-                    for req in predecessor.required_sale_document_requirement_ids:
-                        if not req.optional_requirement:
-                            if not req.employment_status_id:
-                                if req.id not in data.sale_document_requirement_ids.ids:
-                                    required_doc += f"\t{req.name}\n"
-                            elif data.partner_id.employment_status_id and data.partner_id.employment_status_id.id == req.employment_status_id.id:
-                                if req.id not in data.sale_document_requirement_ids.ids:
-                                    required_doc += f"\t{req.name}\n"
-                    for psd in predecessor.project_specific_document_ids:
-                        if psd.be_code == data.be_code:
-                            for psd_document in psd.required_sale_document_requirement_ids:
-                                if not psd_document.optional_requirement:
-                                    if not psd_document.employment_status_id:
-                                        if psd_document.id not in data.sale_document_requirement_ids.ids:
-                                            required_doc += f"\t{psd_document.name}\n"
-                                    elif data.partner_id.employment_status_id and data.partner_id.employment_status_id.id == psd_document.employment_status_id.id:
-                                        if psd_document.id not in data.sale_document_requirement_ids.ids:
-                                            required_doc += f"\t{psd_document.name}\n"
-                    predecessor = predecessor.predecessor_stage_id
+                # while predecessor:
+                for req in predecessor.required_sale_document_requirement_ids:
+                    if not req.optional_requirement:
+                        if not req.employment_status_id:
+                            if req.id not in data.sale_document_requirement_ids.ids:
+                                required_doc += f"\t{req.name}\n"
+                        elif data.employment_status_id and data.employment_status_id.id == req.employment_status_id.id:
+                            if req.id not in data.sale_document_requirement_ids.ids:
+                                required_doc += f"\t{req.name}\n"
+                for psd in predecessor.project_specific_document_ids:
+                    if psd.be_code == data.be_code:
+                        for psd_document in psd.required_sale_document_requirement_ids:
+                            if not psd_document.optional_requirement:
+                                if not psd_document.employment_status_id:
+                                    if psd_document.id not in data.sale_document_requirement_ids.ids:
+                                        required_doc += f"\t{psd_document.name}\n"
+                                elif data.employment_status_id and data.employment_status_id.id == psd_document.employment_status_id.id:
+                                    if psd_document.id not in data.sale_document_requirement_ids.ids:
+                                        required_doc += f"\t{psd_document.name}\n"
+
+                    #Just activate this if need to retroactively need to check document requirement.
+                    #predecessor = predecessor.predecessor_stage_id
             if required_doc != "":
                 msg += f"\nRS: {data.name}\n{required_doc}"
         if msg != "":
             raise ValidationError(_(f"The following documents are required:{msg}"))
 
     def move_to_next_stage(self):
+        # _logger.info(f"\n\n{self.so_number}- {self.stage_id.successor_stage_id.name}\n\n\n")
+        if not self.stage_id.with_successor:
+            raise ValidationError(_(f"There is no stage defined after: {self.stage_id.name}"))
         if self.stage_id.with_successor:
             self._validate_stage_document_requirement(self.stage_id.successor_stage_id)
+        if self.stage_id.successor_stage_id.name == 'Uncontracted':
+            if self.sub_stage_id and not self.sub_stage_id.trigger_admin_qualified:
+                raise ValidationError(_("In order to move the next stage, the account must be tagged first as Admin Qualified."))
         if self.stage_id.successor_stage_id.name == 'Contracted':
             if self.db_for_contracted_sale_tracker:
                 self.check_for_contracted_sale_request_status()
             else:
+                total_paid = self.tcp > 0 and self.total_principal_amount_paid > 0 and (self.total_principal_amount_paid / self.tcp) * 100 or 0
+                crecom = self.env['property.sale.credit.committee.approval'].search([('property_sale_id', '=', self.id)])
+                crecom_approved = False
+                if crecom[:1]:
+                    if crecom.state == 'approved':
+                        crecom_approved = True
+                if not crecom_approved:
+                    raise ValidationError(_("Credit Committee must be fully accomplished First in order to convert to CS Status"))
+                if total_paid < 10 or total_paid < self.dp_amount:
+                    raise ValidationError(_("Must meet the following Criteria in order to convert to CS Status\n\t(1) Payment = 10% of TCP or Full DP whichever comes first \n\t(2) Customer Documents = 100% complete (for customer document source)"))
                 self.set_ready_for_contracted_sale()
                 return {
                     'effect': {
@@ -1471,8 +1488,6 @@ class PropertyAdminSale(models.Model):
                     }
                 }
         else:
-            if not self.stage_id.with_successor:
-                raise ValidationError(_(f"There is no stage defined after: {self.stage_id.name}"))
             if self.stage_id.successor_stage_id.name == 'Loan Released' and self.financing_type in ['INH', 'SPT', 'RTB',
                                                                                                     'RTI', 'DEF',
                                                                                                     'OFF']:
@@ -1736,6 +1751,7 @@ class PropertyAdminSale(models.Model):
                 limit=1)
             if property_detail[:1]:
                 self.property_id = property_detail.id
+                self.property_type = property_detail.property_type
 
     @api.onchange('property_id')
     def _onchange_property_id(self):
@@ -1743,6 +1759,7 @@ class PropertyAdminSale(models.Model):
             self.block_lot = self.property_id.block_lot
             self.be_code = self.property_id.be_code
             self.su_number = self.property_id.su_number
+            self.property_type = self.property_id.property_type
 
     @api.onchange('agent_unique_number')
     def onchange_agent_unique_number(self):

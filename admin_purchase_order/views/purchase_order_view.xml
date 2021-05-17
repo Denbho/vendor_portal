@@ -47,9 +47,18 @@
                         <field name="vendor_payment_count" widget="statinfo" string="Payment Released"/>
                     </button>
                 </div>
-                <field name="company_id" position="after">
-                    <field name="po_doc_type_id"/>
-                    <field name="po_doc_type_code"/>
+                <field name="company_id" position="replace">
+                    <label for="company_id"/>
+                    <div>
+                        [<field name="company_code" class="oe_inline"/>]
+                        <field name="company_id" groups="base.group_multi_company"
+                                options="{'no_create': True}" class="oe_inline"/>
+                    </div>
+                    <label for="po_doc_type_id"/>
+                    <div>
+                        [<field name="po_doc_type_code" class="oe_inline"/>]
+                        <field name="po_doc_type_id" class="oe_inline"/>
+                    </div>
                     <field name="sap_delivery_status"/>
                 </field>
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_qty']" position="attributes">

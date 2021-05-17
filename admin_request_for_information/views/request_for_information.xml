@@ -24,23 +24,6 @@
             </field>
         </record>
 
-        <record id="admin_request_for_information_view_tree" model="ir.ui.view">
-            <field name="name">admin.request.for.information.tree</field>
-            <field name="model">admin.request.for.information</field>
-            <field name="arch" type="xml">
-                <tree string="Request for product information Tree">
-                    <field name="name"/>
-                    <field name="user_id"/>
-                    <field name="company_id"/>
-                    <field name="create_date"/>
-                    <field name="due_date"/>
-                    <field name="subject"/>
-                    <field name="vendor_ids" widget="many2many_tags"/>
-                    <field name="state"/>
-                </tree>
-            </field>
-        </record>
-
         <record id="admin_request_for_information_line_view_form" model="ir.ui.view">
             <field name="name">admin.request.for.information.line.form</field>
             <field name="model">admin.request.for.information.line</field>
@@ -65,11 +48,27 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_rfi_line_search">
+            <field name="name">admin.request.for.information.line.search</field>
+            <field name="model">admin.request.for.information.line</field>
+            <field name="arch" type="xml">
+                <search string="Vendor RFI Mail">
+                    <field name="rfi_id"/>
+                    <field name="partner_id"/>
+                    <group expand="0" string="Group By">
+                        <filter string="RFI" name="grp_rfi_id" context="{'group_by': 'rfi_id'}"/>
+                        <filter string="Vendor" name="grp_partner_id" context="{'group_by': 'partner_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="admin_request_for_information_line_menu_action" model="ir.actions.act_window">
             <field name="name">Vendor RFI Mail</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">admin.request.for.information.line</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_rfi_line_search"/>
         </record>
 
         <menuitem id="admin_request_for_information_line_action_menu" name="RFI Mails"
@@ -82,6 +81,24 @@
             <field name="res_model">admin.request.for.information.line</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('rfi_id', '=', active_id)]</field>
+        </record>
+
+        <record id="admin_request_for_information_view_tree" model="ir.ui.view">
+            <field name="name">admin.request.for.information.tree</field>
+            <field name="model">admin.request.for.information</field>
+            <field name="arch" type="xml">
+                <tree string="Request for product information Tree">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="company_id"/>
+                    <field name="company_code" optional="hidden"/>
+                    <field name="create_date"/>
+                    <field name="due_date"/>
+                    <field name="subject"/>
+                    <field name="vendor_ids" widget="many2many_tags"/>
+                    <field name="state"/>
+                </tree>
+            </field>
         </record>
 
         <record id="admin_request_for_information_view_form" model="ir.ui.view">
@@ -120,7 +137,12 @@
                         <group>
                             <group>
                                 <field name="user_id"/>
-                                <field name="company_id"/>
+                                <label for="company_id"/>
+                                <div>
+                                    [<field name="company_code" class="oe_inline"/>]
+                                    <field name="company_id" groups="base.group_multi_company"
+                                            class="oe_inline" required="1"/>
+                                </div>
                                 <field name="create_date"/>
                                 <field name="sent_rfi" invisible="1"/>
                             </group>
@@ -180,11 +202,39 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_rfi_search">
+            <field name="name">admin.request.for.information.search</field>
+            <field name="model">admin.request.for.information</field>
+            <field name="arch" type="xml">
+                <search string="Request For Information Details">
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="company_id"/>
+                    <field name="company_code"/>
+                    <field name="vendor_ids"/>
+                    <field name="state"/>
+                    <filter string="Waiting for Confirmation" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                    <filter string="Waiting for Verification" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                    <filter string="Waiting for Approval" name="verified" domain="[('state', '=', 'verified')]"/>
+                    <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+                    <separator/>
+                    <filter string="Due Date" name="due_date" date="due_date"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Purchasing Officer" name="grp_user_id" context="{'group_by': 'user_id'}"/>
+                        <filter string="Company" name="grp_company_id" context="{'group_by': 'company_id'}"/>
+                        <filter string="Status" name="grp_state" context="{'group_by': 'state'}"/>
+                        <filter string="Due Date" name="grp_due_date" context="{'group_by': 'due_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="admin_request_for_information_action" model="ir.actions.act_window">
             <field name="name">Request For Information Details</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">admin.request.for.information</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_rfi_search"/>
         </record>
 
         <menuitem id="admin_request_for_information_action_menu" name="RFI Details"

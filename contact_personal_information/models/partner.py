@@ -2,6 +2,7 @@
 from odoo import fields, models, api, _
 from odoo.exceptions import UserError, ValidationError
 from datetime import date, datetime
+from dateutil.parser import parse
 import locale
 import logging
 
@@ -79,8 +80,9 @@ class ResPartner(models.Model):
     gender = fields.Selection([
         ('male', 'Male'),
         ('female', 'Female'),
-        ('other', 'Other')
-    ], string="Gender", tracking=True)
+        ('other', 'Other'),
+        ('unspecified', 'Unspecified')
+    ], string="Gender", defualt="unspecified", tracking=True)
     marital = fields.Selection([
         ('single', 'Single'),
         ('married', 'Married'),
@@ -88,20 +90,23 @@ class ResPartner(models.Model):
         ('widowed', 'Widowed'),
         ('divorced', 'Divorced'),
         ('separated', 'Separated'),
-        ('annulled', 'Annulled')
-    ], string='Marital Status', tracking=True)
+        ('annulled', 'Annulled'),
+        ('unspecified', 'Unspecified')
+    ], string='Marital Status', defualt="unspecified", tracking=True)
     mobile = fields.Char(string="Primary Mobile No.")
     mobile2 = fields.Char(string="Secondary Mobile No.")
     phone = fields.Char(string="Landline No.")
     religion_id = fields.Many2one('res.partner.religion', string="Religion")
     nationality_country_id = fields.Many2one('res.country', string="Nationality")
-    employment_status_id = fields.Many2one('res.partner.employment.status', string="Employment Status", help="Class Code")
+    employment_status_id = fields.Many2one('res.partner.employment.status', string="Employment Type", help="Class Code")
     employment_country_id = fields.Many2one('res.country', string="Employment Country")
     profession_id = fields.Many2one('res.partner.profession', string="Profession")
     age = fields.Integer(string="Age", readonly=True)
     age_range_id = fields.Many2one('res.partner.age.range', string="Age Range")
     monthly_income_range_id = fields.Many2one('res.partner.monthly.income.range', string="Monthly Income Range")
     monthly_income = fields.Float('Monthly Income')
+    income_currency_id = fields.Many2one('res.currency', string="Income Currency")
+    income_currency_code = fields.Char(string="Income Currency Code")
     social_twitter = fields.Char('Twitter Account')
     social_facebook = fields.Char('Facebook Account')
     social_github = fields.Char('GitHub Account')
@@ -109,11 +114,33 @@ class ResPartner(models.Model):
     social_youtube = fields.Char('Youtube Account')
     social_instagram = fields.Char('Instagram Account')
 
+    @api.onchange('income_currency_id')
+    def onchange_currency_id(self):
+        if self.income_currency_id:
+            self.income_currency_code = self.income_currency_id.name
+
+    def is_valid_date(self, date):
+        if date:
+            try:
+                parse(date)
+                return True
+            except:
+                return False
+        return False
+
+    @api.onchange('income_currency_code')
+    def onchange_currency_code(self):
+        if self.income_currency_code:
+            currency = self.env['res.currency'].sudo().search([('name', '=', self.income_currency_code)])
+            self.income_currency_id = currency[:1] and currency.id or self.company_id.currency_id
+
     @api.model
     def create(self, vals):
         if vals.get('date_of_birth'):
+            if not self.is_valid_date(vals.get('date_of_birth')):
+                vals['date_of_birth'] = False
             # _logger.info(f"\n\n{datetime.strptime(vals.get('date_of_birth'), '%Y-%m-%d')}\n\n")
-            age = date.today().year - datetime.strptime(vals.get('date_of_birth'), "%Y-%m-%d").year
+            age = int((datetime.now() - datetime.strptime(vals.get('date_of_birth'), "%Y-%m-%d")).days / 365.25)
             age_range = self.env['res.partner.age.range'].search(
                 [('range_from', '<=', age), ('range_to', '>=', age)], limit=1)
             vals.update({
@@ -125,7 +152,9 @@ class ResPartner(models.Model):
             income_range = self.env['res.partner.monthly.income.range'].search(
                 [('range_from', '<=', vals.get('monthly_income')), ('range_to', '>=', vals.get('monthly_income'))], limit=1)
             vals['monthly_income_range_id'] = income_range[:1] and income_range.id or False
-        return super(ResPartner, self).create(vals)
+        res = super(ResPartner, self).create(vals)
+        res.onchange_currency_code()
+        return res
 
     def split_date(self, date):
         """
@@ -139,7 +168,7 @@ class ResPartner(models.Model):
 
     def write(self, vals):
         if 'date_of_birth' in vals and vals.get('date_of_birth'):
-            age = date.today().year - datetime.strptime(vals.get('date_of_birth'), "%Y-%m-%d").year
+            age = int((datetime.now() - datetime.strptime(vals.get('date_of_birth'), "%Y-%m-%d")).days / 365.25)
             age_range = self.env['res.partner.age.range'].search(
                 [('range_from', '<=', age), ('range_to', '>=', age)], limit=1)
             vals.update({

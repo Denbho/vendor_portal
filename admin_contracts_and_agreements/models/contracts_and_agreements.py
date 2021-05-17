@@ -31,6 +31,7 @@ class ContractsAndAgreements(models.Model):
     contract_date_created = fields.Date(string="Contract/Agreement Creation Date", default=fields.Date.today(), track_visibility='onchange')
     purchasing_officer = fields.Many2one('res.users', string='Purchasing Officer', track_visibility='onchange')
     company_id = fields.Many2one('res.company', string='Company', track_visibility='onchange')
+    company_code = fields.Char(string='Company Code', track_visibility='onchange')
     start_date = fields.Date(string="Start Date", track_visibility='onchange', required=True)
     end_date = fields.Date(string="End Date", track_visibility='onchange')
     total_con_agreement_amt = fields.Float(string="Total Contract/Agreement Amount", track_visibility='onchange')
@@ -54,6 +55,18 @@ class ContractsAndAgreements(models.Model):
                              required=True,
                              copy=False,
                              default='draft',)
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+            company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+            if company[:1]:
+                self.company_id = company.id
 
     def action_send_notice_to_proceed(self):
         '''
@@ -139,6 +152,8 @@ class ContractsAndAgreements(models.Model):
     def create(self, values):
         values['name'] = self.env['ir.sequence'].get('contracts.and.agreements') or 'New'
         res = super(ContractsAndAgreements, self).create(values)
+        res.onchange_company_id()
+        res.onchange_company_code()
         return res
 
     def action_view_company_allocation(self):

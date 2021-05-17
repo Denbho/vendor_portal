@@ -52,13 +52,6 @@
         <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
     </record>
 
-    <record id="property_project_portal_rule" model="ir.rule">
-        <field name="name">Property Project Portal</field>
-        <field name="model_id" ref="property_admin_monitoring.model_property_subdivision_phase"/>
-        <field name="domain_force">[]</field>
-        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
-    </record>
-
     <record model="ir.rule" id="property_unit_rule">
         <field name="name">Property Unit Multi Company</field>
         <field name="model_id" ref="property_admin_monitoring.model_property_detail"/>
@@ -66,53 +59,25 @@
         <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
     </record>
 
-    <record id="property_unit_portal_rule" model="ir.rule">
-        <field name="name">Property Unit Portal</field>
-        <field name="model_id" ref="property_admin_monitoring.model_property_detail"/>
-        <field name="domain_force">[]</field>
-        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
-    </record>
-
     <record model="ir.rule" id="property_sale_rule">
         <field name="name">Property Sale Multi Company</field>
         <field name="model_id" ref="property_admin_monitoring.model_property_admin_sale"/>
         <field name="global" eval="True"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
-    </record>
-
-    <record id="property_sale_portal_rule" model="ir.rule">
-        <field name="name">Property Sale Portal</field>
-        <field name="model_id" ref="property_admin_monitoring.model_property_admin_sale"/>
-        <field name="domain_force">[]</field>
-        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">['|','|',('partner_id', '=', user.partner_id.id),('company_id','=',False),('company_id', 'in', company_ids)]</field>
     </record>
 
     <record model="ir.rule" id="property_soa_rule">
         <field name="name">Property SOA Multi Company</field>
         <field name="model_id" ref="property_admin_monitoring.model_property_sale_statement_of_account"/>
         <field name="global" eval="True"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
-    </record>
-
-    <record id="property_soa_portal_rule" model="ir.rule">
-        <field name="name">Property SOA Portal</field>
-        <field name="model_id" ref="property_admin_monitoring.model_property_sale_statement_of_account"/>
-        <field name="domain_force">[]</field>
-        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">['|','|',('partner_id', '=', user.partner_id.id),('company_id','=',False),('company_id', 'in', company_ids)]</field>
     </record>
 
     <record model="ir.rule" id="property_payment_rule">
         <field name="name">Property Payment Multi Company</field>
         <field name="model_id" ref="property_admin_monitoring.model_property_ledger_payment_item"/>
         <field name="global" eval="True"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
-    </record>
-
-    <record id="property_payment_portal_rule" model="ir.rule">
-        <field name="name">Property Payment Portal</field>
-        <field name="model_id" ref="property_admin_monitoring.model_property_ledger_payment_item"/>
-        <field name="domain_force">[]</field>
-        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="domain_force">['|','|',('partner_id', '=', user.partner_id.id),('company_id','=',False),('company_id', 'in', company_ids)]</field>
     </record>
 
   </data>

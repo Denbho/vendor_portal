@@ -83,11 +83,12 @@ class PropertySaleStatementOfAccount(models.Model):
 
     customer_number = fields.Char(string="Customer #", index=True, track_visibility="always")
     so_number = fields.Char(string="SO #", required=True, track_visibility="always")
-    property_sale_id = fields.Many2one('property.admin.sale', string="Property Sale", store=True, compute="_get_property_sale_details")
+    property_sale_id = fields.Many2one('property.admin.sale', string="Property Sale")
     company_code = fields.Char(string="Company Code", track_visibility="always")
     partner_id = fields.Many2one('res.partner', string="Customer", store=True, compute="_get_contact_details")
     company_id = fields.Many2one('res.company', 'Company', index=True,
                                  store=True, compute="_get_contact_details", check_company=True)
+    currency_id = fields.Many2one('res.currency', string="Currency", related="company_id.currency_id", store=True)
     be_code = fields.Char(string="BE Code", help="Business Entity Code", track_visibility="always")
     block_lot = fields.Char(string="Block-Lot", track_visibility="always")
     su_number = fields.Char(string="SU Number", track_visibility="always")
@@ -100,9 +101,9 @@ class PropertySaleStatementOfAccount(models.Model):
     soa_year = fields.Integer(string="Year", compute='_get_date_parsed', store=True)
     soa_due_date = fields.Date(string="Due Date", required=True, track_visibility="always")
     current_amount = fields.Float(string="Current Amount Dues", track_visibility="always")
-    penalty = fields.Float(string="Penalty", store=True, compute="_get_total_past_dues")
-    past_due = fields.Float(string="Past Dues", store=True, compute="_get_total_past_dues")
-    past_due_count = fields.Integer(string="Past Due Count", store=True, compute="_get_total_past_dues")
+    penalty = fields.Float(string="Penalty")
+    past_due = fields.Float(string="Past Dues")
+    past_due_count = fields.Integer(string="Past Due Count")
     past_due_line_ids = fields.One2many('property.sale.soa.overdue.line', 'soa_id', string="Past Due Breakdown")
     total_amount_due = fields.Float(string="Total Amount Due", compute='_get_total_amount_due', store=True)
     accrued_interest = fields.Float(string="Accrued Interest")
@@ -128,12 +129,12 @@ class PropertySaleStatementOfAccount(models.Model):
                 rec = company.sudo().search([('code', '=', r.company_code)], limit=1)
                 r.company_id = rec[:1] and rec.id or False
 
-    @api.depends('so_number')
-    def _get_property_sale_details(self):
-        property_sale = self.env['property.admin.sale']
-        for r in self:
-            property_sale_rec = property_sale.sudo().search([('so_number', '=', r.so_number)], limit=1)
-            r.property_sale_id = property_sale_rec[:1] and property_sale_rec.id or False
+    # @api.depends('so_number')
+    # def _get_property_sale_details(self):
+    #     property_sale = self.env['property.admin.sale']
+    #     for r in self:
+    #         property_sale_rec = property_sale.sudo().search([('so_number', '=', r.so_number)], limit=1)
+    #         r.property_sale_id = property_sale_rec[:1] and property_sale_rec.id or False
 
     @api.onchange('so_number')
     def onchange_so_number(self):
@@ -157,19 +158,19 @@ class PropertySaleStatementOfAccount(models.Model):
             res.message_post_with_template(email_temp.id)
         return res
 
-    @api.depends('past_due_line_ids', 'past_due_line_ids.amount_due', 'past_due_line_ids.penalty')
-    def _get_total_past_dues(self):
-        for i in self:
-            total = 0
-            penalty = 0
-            count = 0
-            for r in i.past_due_line_ids:
-                total += r.billing_amount
-                penalty += r.penalty
-                count += 1
-            i.past_due = total
-            i.penalty = penalty
-            i.past_due_count = count
+    # @api.depends('past_due_line_ids', 'past_due_line_ids.amount_due', 'past_due_line_ids.penalty')
+    # def _get_total_past_dues(self):
+    #     for i in self:
+    #         total = 0
+    #         penalty = 0
+    #         count = 0
+    #         for r in i.past_due_line_ids:
+    #             total += r.billing_amount
+    #             penalty += r.penalty
+    #             count += 1
+    #         i.past_due = total
+    #         i.penalty = penalty
+    #         i.past_due_count = count
 
     @api.depends('soa_date')
     def _get_date_parsed(self):
@@ -214,7 +215,7 @@ class PropertyLedgerPaymentItem(models.Model):
     line_counter = fields.Integer(string="Line Item Counter")
     customer_number = fields.Char(string="Customer #")
     so_number = fields.Char(string="SO #", required=True)
-    property_sale_id = fields.Many2one('property.admin.sale', string="Property Sale", store=True, compute="_get_property_sale_details")
+    property_sale_id = fields.Many2one('property.admin.sale', string="Property Sale")
     so_assign_number = fields.Char(string="Assignment #", help="SO Number sa SAP financial side")
     partner_id = fields.Many2one('res.partner', string="Customer", store=True, compute="_get_contact_details")
     company_code = fields.Char(string="Company Code")
@@ -384,12 +385,12 @@ class PropertyLedgerPaymentItem(models.Model):
         res.onchange_so_number()
         return res
 
-    @api.depends('so_number')
-    def _get_property_sale_details(self):
-        property_sale = self.env['property.admin.sale']
-        for r in self:
-            property_sale_rec = property_sale.sudo().search([('so_number', '=', r.so_number)], limit=1)
-            r.property_sale_id = property_sale_rec[:1] and property_sale_rec.id or False
+    # @api.depends('so_number')
+    # def _get_property_sale_details(self):
+    #     property_sale = self.env['property.admin.sale']
+    #     for r in self:
+    #         property_sale_rec = property_sale.sudo().search([('so_number', '=', r.so_number)], limit=1)
+    #         r.property_sale_id = property_sale_rec[:1] and property_sale_rec.id or False
 
     @api.depends('customer_number', 'company_code')
     def _get_contact_details(self):

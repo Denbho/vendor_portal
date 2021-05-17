@@ -32,9 +32,13 @@
                         </div>
                         <group>
                             <group>
-                                <field name="company_id" options="{&quot;no_create&quot;: True}"
-                                       groups="base.group_multi_company"/>
-                                <field name="received_by"/>
+                                <label for="company_id"/>
+                                <div>
+                                   [<field name="company_code" class="oe_inline"/>]
+                                   <field name="company_id" groups="base.group_multi_company"
+                                          options="{'no_create': True}" class="oe_inline"/>
+                                </div>
+                                <field name="delivered_by"/>
                                 <field name="received_by"/>
                                 <field name="receiving_date"/>
                             </group>
@@ -83,12 +87,37 @@
                 <tree string="PO Delivery Tree">
                     <field name="po_id"/>
                     <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="company_code"/>
                     <field name="gr_number"/>
                     <field name="dr_no"/>
                     <field name="dr_date"/>
                     <field name="received_original_doc"/>
                     <field name="countered"/>
                 </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_po_delivery_line_search">
+            <field name="name">po.delivery.line.search</field>
+            <field name="model">po.delivery.line</field>
+            <field name="arch" type="xml">
+                <search string="Deliveries">
+                    <field name="po_id"/>
+                    <field name="company_id"/>
+                    <field name="company_code"/>
+                    <field name="gr_number"/>
+                    <field name="dr_no"/>
+                    <filter string="DR Date" name="dr_date" date="dr_date"/>
+                    <group expand="0" string="Group By">
+                        <filter string="PO #" name="grp_po_id" context="{'group_by': 'po_id'}"/>
+                        <filter string="Company" name="grp_company_id" context="{'group_by': 'company_id'}"/>
+                        <filter string="GR No." name="grp_gr_number" context="{'group_by': 'gr_number'}"/>
+                        <filter string="DR No." name="grp_dr_no" context="{'group_by': 'dr_no'}"/>
+                        <filter string="DR Date" name="grp_dr_date" context="{'group_by': 'dr_date'}"/>
+                        <filter string="Received Original Docs" name="grp_received_original_doc" context="{'group_by': 'received_original_doc'}"/>
+                        <filter string="Countered" name="grp_countered" context="{'group_by': 'countered'}"/>
+                    </group>
+                </search>
             </field>
         </record>
 
@@ -106,6 +135,7 @@
             <field name="res_model">po.delivery.line</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_po_delivery_line_search"/>
         </record>
 
         <menuitem action="action_po_delivery_line_form" id="menu_action_po_delivery_line_form"
@@ -125,10 +155,10 @@
                                 <field name="name" default_focus="1" placeholder="Payment Transaction Number"/>
                             </h1>
                             <div>
-                                <label for="company_id" class="oe_inline"/>
-                                <field name="company_id" required="1" groups="base.group_multi_company"
-                                       options="{&quot;no_create&quot;: True}"
-                                       class="oe_inline oe_input_align"/>
+                                <label for="company_id"/>
+                                [<field name="company_code" class="oe_inline"/>]
+                                <field name="company_id" groups="base.group_multi_company" required="1"
+                                      class="oe_inline"  options="{'no_create': True}"/>
                             </div>
                         </div>
                         <group>
@@ -172,6 +202,7 @@
                     <field name="name"/>
                     <field name="vendor_partner_id"/>
                     <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="company_code" optional="hidden"/>
                     <field name="admin_si_id"/>
                     <field name="amount"/>
                     <field name="payment_release_date"/>
@@ -194,11 +225,32 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_admin_invoice_payment_search">
+            <field name="name">admin.invoice.payment.search</field>
+            <field name="model">admin.invoice.payment</field>
+            <field name="arch" type="xml">
+                <search string="Payment Release Search">
+                    <field name="name"/>
+                    <field name="vendor_partner_id"/>
+                    <field name="company_id"/>
+                    <field name="company_code"/>
+                    <field name="admin_si_id"/>
+                    <field name="or_number"/>
+                    <filter string="Payment Date" name="payment_release_date" date="payment_release_date"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Supplier/Vendor" name="grp_vendor_partner_id" context="{'group_by': 'vendor_partner_id'}"/>
+                        <filter string="Company" name="grp_company_id" context="{'group_by': 'company_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="action_admin_invoice_payment_form_open" model="ir.actions.act_window">
             <field name="name">Payment Release</field>
             <field name="res_model">admin.invoice.payment</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_mode">tree,form,pivot</field>
+            <field name="search_view_id" ref="view_admin_invoice_payment_search"/>
         </record>
 
         <menuitem action="action_admin_invoice_payment_form_open" id="menu_action_admin_invoice_payment_form_open"
@@ -224,10 +276,10 @@
                                 <field name="vendor_si_number" default_focus="1" placeholder="Sales Invoice Number"/>
                             </h1>
                             <div>
-                                <label for="company_id" class="oe_inline"/>
-                                <field name="company_id" required="1" groups="base.group_multi_company"
-                                       options="{&quot;no_create&quot;: True}"
-                                       class="oe_inline oe_input_align"/>
+                                <label for="company_id"/>
+                                [<field name="company_code" class="oe_inline"/>]
+                                <field name="company_id" groups="base.group_multi_company" required="1"
+                                      class="oe_inline"  options="{'no_create': True}"/>
                             </div>
                         </div>
                         <group>
@@ -272,6 +324,7 @@
                 <tree string="SI tree">
                     <field name="vendor_partner_id"/>
                     <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="company_code"/>
                     <field name="admin_si_type"/>
                     <field name="vendor_si_number"/>
                     <field name="invoice_date"/>
@@ -293,11 +346,32 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_admin_sales_invoice_search">
+            <field name="name">admin.sales.invoice.search</field>
+            <field name="model">admin.sales.invoice</field>
+            <field name="arch" type="xml">
+                <search string="Sales Invoice Search">
+                    <field name="vendor_partner_id"/>
+                    <field name="company_id"/>
+                    <field name="company_code"/>
+                    <field name="admin_si_type"/>
+                    <field name="vendor_si_number"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Supplier/Vendor" name="grp_vendor_partner_id" context="{'group_by': 'vendor_partner_id'}"/>
+                        <filter string="Company" name="grp_company_id" context="{'group_by': 'company_id'}"/>
+                        <filter string="Document Type" name="grp_admin_si_type" context="{'group_by': 'admin_si_type'}"/>
+                        <filter string="Countered" name="grp_countered" context="{'group_by': 'countered'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="action_admin_sales_invoice_form_open" model="ir.actions.act_window">
             <field name="name">Vendor Sales Invoice</field>
             <field name="res_model">admin.sales.invoice</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_mode">tree,form,pivot</field>
+            <field name="search_view_id" ref="view_admin_sales_invoice_search"/>
         </record>
 
         <menuitem action="action_admin_sales_invoice_form_open" id="menu_action_admin_sales_invoice_open_form"

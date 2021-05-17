@@ -79,7 +79,7 @@
         </record>
 
         <record id="res_partner_employment_status_action_form" model="ir.actions.act_window">
-            <field name="name">Employment Status</field>
+            <field name="name">Employment Type</field>
             <field name="res_model">res.partner.employment.status</field>
             <field name="view_mode">tree,form</field>
         </record>
@@ -138,7 +138,9 @@
                                 <field name="employment_status_id"/>
                                 <field name="employment_country_id"/>
                                 <field name="profession_id"/>
-                                <field name="monthly_income"/>
+                                <field name="income_currency_id"/>
+                                <field name="income_currency_code" readonly="1" force_save="1"/>
+                                <field name="monthly_income" widget="monetary" options="{'currency_field': 'income_currency_id'}"/>
                                 <field name="monthly_income_range_id" readonly="1" force_save="1"/>
                             </group>
                             <group colspan="2" name="social_media">

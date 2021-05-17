@@ -53,7 +53,13 @@
                     <field name="purchasing_officer" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
                   </group>
                   <group>
-                    <field name="company_id" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    <label for="company_id"/>
+                    <div>
+                        [<field name="company_code" class="oe_inline"
+                              attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>]
+                        <field name="company_id" groups="base.group_multi_company" class="oe_inline"
+                              attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
+                    </div>
                     <field name="start_date" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
                     <field name="end_date" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
                     <field name="total_con_agreement_amt" attrs="{'readonly': [('state', 'not in', ['draft','waiting_to_verify'])]}"/>
@@ -136,6 +142,7 @@
                   <field name="contract_agreement_name"/>
                   <field name="contract_date_created" optional="hide"/>
                   <field name="company_id"/>
+                  <field name="company_code" optional="hidden"/>
                   <field name="start_date"/>
                   <field name="end_date"/>
                   <field name="purchasing_officer"/>
@@ -157,14 +164,43 @@
           </field>
       </record>
 
+      <record model="ir.ui.view" id="view_contracts_and_agreements_search">
+          <field name="name">contracts.and.agreements.search</field>
+          <field name="model">contracts.and.agreements</field>
+          <field name="arch" type="xml">
+              <search string="Contracts and Agreements Search">
+                  <field name="name"/>
+                  <field name="ref_no"/>
+                  <field name="partner_id"/>
+                  <field name="contract_agreement_name"/>
+                  <field name="company_id"/>
+                  <field name="company_code"/>
+                  <field name="purchasing_officer"/>
+                  <field name="state"/>
+                  <filter string="Waiting to Verify" name="waiting_to_verify" domain="[('state', '=', 'waiting_to_verify')]"/>
+                  <filter string="Verified" name="verified" domain="[('state', '=', 'verified')]"/>
+                  <filter string="Waiting for Approval" name="waiting_for_approval" domain="[('state', '=', 'waiting_for_approval')]"/>
+                  <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+                  <separator/>
+                  <filter string="Start Date" name="start_date" date="start_date"/>
+                  <filter string="End Date" name="end_date" date="end_date"/>
+                  <group expand="0" string="Group By">
+                      <filter string="Vendor" name="grp_partner_id" context="{'group_by': 'partner_id'}"/>
+                      <filter string="Company" name="grp_company_id" context="{'group_by': 'company_id'}"/>
+                      <filter string="Purchasing Officer" name="grp_purchasing_officer" context="{'group_by': 'purchasing_officer'}"/>
+                      <filter string="Status" name="grp_state" context="{'group_by': 'state'}"/>
+                  </group>
+              </search>
+          </field>
+      </record>
+
       <record id="contracts_and_agreements_action" model="ir.actions.act_window">
           <field name="name">Contracts and Agreements</field>
           <field name="type">ir.actions.act_window</field>
           <field name="res_model">contracts.and.agreements</field>
           <field name="view_mode">tree,form,pivot</field>
           <field name="view_id" ref="contracts_and_agreements_tree"/>
-          <field name="domain">[]</field>
-          <field name="context">{}</field>
+          <field name="search_view_id" ref="view_contracts_and_agreements_search"/>
           <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
               Create a contracts and agreements.

@@ -154,7 +154,11 @@
                         <group>
                             <group>
                                 <field name="user_id"/>
-                                <field name="company_id"/>
+                                <label for="company_id"/>
+                                <div>
+                                    [<field name="company_code" class="oe_inline"/>]
+                                    <field name="company_id" groups="base.group_multi_company" class="oe_inline" required="1"/>
+                                </div>
                                 <field name="create_date"/>
                             </group>
                             <group>
@@ -262,6 +266,7 @@
                                             <field name="quantity_company_ids" nolabel="1" colspan="2">
                                                 <tree string="Company Requirement" editable="1">
                                                     <field name="company_id"/>
+                                                    <field name="company_code"/>
                                                     <field name="product_id"/>
                                                     <field name="qty" sum="Total"/>
                                                     <field name="product_uom"/>
@@ -290,6 +295,7 @@
                     <field name="name"/>
                     <field name="user_id"/>
                     <field name="company_id"/>
+                    <field name="company_code"/>
                     <filter string="Pending" name="pending" domain="[('state', '=', 'pending')]" help="Pending RFQ"/>
                     <filter string="In Progress" name="sent" domain="[('state', '=', 'sent')]" help="In Progress RFQ"/>
                     <separator/>

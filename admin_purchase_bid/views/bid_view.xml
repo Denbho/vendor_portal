@@ -77,7 +77,14 @@
                                 <field name="scope_of_work" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                             </group>
                             <group>
-                                <field name="company_id" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+                                <label for="company_id"/>
+                                <div>
+                                    [<field name="company_code" class="oe_inline"
+                                            attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>]
+                                    <field name="company_id" groups="base.group_multi_company" required="1"
+                                            attrs="{'readonly': [('state', 'not in', ['draft'])]}" class="oe_inline"/>
+                                </div>
+
                                 <field name="bid_opening_date" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
                                 <field name="bid_closing_date"
                                        attrs="{
@@ -327,6 +334,7 @@
                     <field name="scope_of_work_remark" widget="html" optional="hide"/>
                     <field name="purchasing_officer"/>
                     <field name="company_id"/>
+                    <field name="company_code" optional="hide"/>
                     <field name="bid_opening_date"/>
                     <field name="bid_closing_date"/>
                     <field name="date_halted" optional="hide"/>
@@ -366,6 +374,7 @@
                     <field name="scope_of_work"/>
                     <field name="purchasing_officer"/>
                     <field name="company_id"/>
+                    <field name="company_code"/>
                     <filter string="Pre-Bidding" name="pre_bidding" domain="[('state', '=', 'pre_bidding')]"/>
                     <filter string="Post-Bidding" name="post_bidding" domain="[('state', '=', 'post_bidding')]"/>
                     <filter string="Bid Selection" name="bid_selection" domain="[('state', '=', 'bid_selection')]"/>
@@ -716,7 +725,7 @@
             <field name="name">purchase.bid.vendor.search</field>
             <field name="model">purchase.bid.vendor</field>
             <field name="arch" type="xml">
-                <search string="Bidders Details">
+                <search string="Bidders Details Search">
                     <field name="partner_id"/>
                     <field name="contact_id"/>
                     <field name="bid_id"/>
@@ -728,8 +737,8 @@
                     <filter string="Deadline of Submission" name="deadline_of_submission" date="deadline_of_submission"/>
                     <group expand="0" string="Group By">
                         <filter string="Vendor" name="grp_partner_id" context="{'group_by': 'partner_id'}"/>
-                        <filter string="Contact Person" name="group_contact_id" context="{'group_by': 'contact_id'}"/>
-                        <filter string="Bid" name="group_state" context="{'group_by': 'bid_id'}"/>
+                        <filter string="Contact Person" name="grp_contact_id" context="{'group_by': 'contact_id'}"/>
+                        <filter string="Bid" name="grp_bid_id" context="{'group_by': 'bid_id'}"/>
                     </group>
                 </search>
             </field>

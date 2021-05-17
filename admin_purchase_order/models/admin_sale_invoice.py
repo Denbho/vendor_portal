@@ -26,12 +26,25 @@ class AdminInvoicePayment(models.Model):
     si_amount = fields.Float('SI Amount', store=True, related="admin_si_id.amount")
     purchase_id = fields.Many2one('purchase.order', string="Purchase Order", store=True, related="admin_si_id.purchase_id")
     vendor_partner_id = fields.Many2one('res.partner', string="Supplier/Vendor", required=True)
-    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company, index=True, required=True)
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company, index=True)
+    company_code = fields.Char(string='Company Code')
 
     # @api.onchange('admin_si_id')
     # def onchange_admin_si(self):
     #     if self.admin_si_id:
     #         self.purchase_id = self.admin_si_id.purchase_id and self.admin_si_id.purchase_id.id or False
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+            company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+            if company[:1]:
+                self.company_id = company.id
 
     def check_amount_against_invoice(self, invoice_id, amount):
         r = self.env['admin.sales.invoice'].sudo().browse(invoice_id)
@@ -45,6 +58,8 @@ class AdminInvoicePayment(models.Model):
         if vals.get('admin_si_id'):
             self.check_amount_against_invoice(vals.get('admin_si_id'), vals.get('amount'))
         res = super(AdminInvoicePayment, self).create(vals)
+        res.onchange_company_id()
+        res.onchange_company_code()
         return res
 
     def write(self, vals):
@@ -68,7 +83,8 @@ class AdminSalesInvoice(models.Model):
     vendor_partner_id = fields.Many2one('res.partner', string="Supplier/Vendor", required=True)
     vendor_si_number = fields.Char(string="Vendor SI Number", required=True, track_visibility="always", copy=False,
                                    index=True)
-    company_id = fields.Many2one('res.company', string="Company", required=True, track_visibility="always")
+    company_id = fields.Many2one('res.company', string="Company", track_visibility="always")
+    company_code = fields.Char(string='Company Code', track_visibility="always")
     amount = fields.Float(string="Amount", track_visibility="always")
     invoice_date = fields.Date(string="Date", track_visibility="always")
     vendor_remarks = fields.Text(string="Vendor Remarks", track_visibility="always")
@@ -76,6 +92,18 @@ class AdminSalesInvoice(models.Model):
     countered = fields.Boolean(string="Countered")
     countered_date = fields.Date(string="Countered Date")
     vendor_payment_count = fields.Integer(compute="_compute_vendor_payment_count")
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+            company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+            if company[:1]:
+                self.company_id = company.id
 
     def _compute_vendor_payment_count(self):
         for r in self:
@@ -126,6 +154,8 @@ class AdminSalesInvoice(models.Model):
         if vals.get('purchase_id'):
             self.check_amount_against_invoice(vals.get('purchase_id'), vals.get('amount'))
         res = super(AdminSalesInvoice, self).create(vals)
+        res.onchange_company_id()
+        res.onchange_company_code()
         return res
 
     def write(self, vals):

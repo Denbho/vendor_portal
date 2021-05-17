@@ -15,8 +15,27 @@ class AdminRequestForQuotationCompanyQty(models.Model):
     product_uom = fields.Many2one('uom.uom', string='Product Unit of Measure', store=True,
                                   related="rfq_line_id.product_uom")
     qty = fields.Float(string="Quantity", required=True)
-    company_id = fields.Many2one('res.company', string="Company", required=True)
+    company_id = fields.Many2one('res.company', string="Company")
+    company_code = fields.Char(string='Company Code')
 
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+            company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+            if company[:1]:
+                self.company_id = company.id
+
+    @api.model
+    def create(self, vals):
+        res = super(AdminRequestForQuotationCompanyQty,self).create(vals)
+        res.onchange_company_id()
+        res.onchange_company_code()
+        return res
 
 class AdminVendorRFQ(models.Model):
     _name = 'admin.vendor.rfq'
@@ -204,8 +223,8 @@ class AdminRequestForQuotation(models.Model):
     ], string='Status', readonly=True, copy=False, index=True, tracking=True, default='draft')
     name = fields.Char('Request Reference', copy=False, readonly=True, index=True,
                        default=lambda self: _('New'))
-    company_id = fields.Many2one('res.company', 'Company', required=True,
-                        default=lambda self: self.env.company, tracking=True,)
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company, tracking=True,)
+    company_code = fields.Char(string='Company Code', tracking=True)
     user_id = fields.Many2one('res.users', string='Purchasing Officer', index=True, tracking=True,
                               default=lambda self: self.env.user)
     create_date = fields.Datetime(
@@ -220,9 +239,24 @@ class AdminRequestForQuotation(models.Model):
     rfq_line_ids = fields.One2many('admin.request.for.quotation.line', 'rfq_id')
     vendor_quotation_count = fields.Integer(compute="_get_vendor_quotation_count")
 
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+            company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+            if company[:1]:
+                self.company_id = company.id
+
     @api.model
     def create(self, vals):
         vals['name'] = self.env['ir.sequence'].get('vendor.request.for.quotation')
+        res = super(AdminRequestForQuotation,self).create(vals)
+        res.onchange_company_id()
+        res.onchange_company_code()
         return super(AdminRequestForQuotation, self).create(vals)
 
     def set_rfq_done(self):

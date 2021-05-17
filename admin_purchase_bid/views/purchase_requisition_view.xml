@@ -24,6 +24,20 @@
           </field>
       </record>
 
+      <record id="view_pr_material_details_search" model="ir.ui.view">
+          <field name="name">pr.material.details.search</field>
+          <field name="model">purchase.requisition.material.details</field>
+          <field name="inherit_id" ref="admin_purchase_requisition.view_pr_material_details_search"/>
+          <field name="arch" type="xml">
+              <field name="rfq_id" position="before">
+                  <field name="bid_id"/>
+            </field>
+            <xpath expr="//filter[@name='grp_rfq_id']" position="before">
+                <filter string="Bid No." name="grp_bid_id" context="{'group_by': 'bid_id'}"/>
+            </xpath>
+          </field>
+      </record>
+
       <record id="purchase_requisition_material_details_filter" model="ir.ui.view">
           <field name="name">purchase.requisition.material.details.search</field>
           <field name="model">purchase.requisition.material.details</field>

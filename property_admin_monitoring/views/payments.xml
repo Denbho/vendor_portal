@@ -151,7 +151,7 @@
             <field name="model">property.ledger.payment.item</field>
             <field name="arch" type="xml">
                 <tree string="Payment Line Tree" editable="top">
-                    <field name="line_counter" widget="handle"/>
+                    <field name="line_counter"/>
                     <field name="so_number"/>
                     <field name="company_id" filter_domain="['|',('company_code', 'ilike', self)]"/>
                     <field name="company_code" optional="show"/>

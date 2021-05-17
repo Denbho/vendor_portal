@@ -23,6 +23,8 @@ class HelpdeskTicket(models.Model):
     partner_email = fields.Char(string='Customer Email', store=True, compute="_get_property_sale_partner",
                                  inverse="_get_inverse_property_sale_partner")
 
+
+
     @api.depends('so_number')
     def _get_property_sale_partner(self):
         property_sale = self.env['property.admin.sale']
