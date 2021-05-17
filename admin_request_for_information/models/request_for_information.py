@@ -41,8 +41,10 @@ class AdminRequestForInformation(models.Model):
                              default='draft', readonly=True, copy=False, track_visibility="always")
     name = fields.Char('Request Reference', copy=False, readonly=True, index=True,
                        default=lambda self: _('New'))
-    company_id = fields.Many2one('res.company', 'Company', required=True, readonly=True,
+    company_id = fields.Many2one('res.company', 'Company', readonly=True,
                         default=lambda self: self.env.company, track_visibility="always",
+                        states={'draft': [('readonly', False)]})
+    company_code = fields.Char(string='Company Code', readonly=True, track_visibility="always",
                         states={'draft': [('readonly', False)]})
     user_id = fields.Many2one('res.users', string='Purchasing Officer', index=True, tracking=True, required=True,
                               default=lambda self: self.env.user, track_visibility="always", readonly=True,
@@ -61,6 +63,25 @@ class AdminRequestForInformation(models.Model):
     body_html = fields.Html(string="Email Body", required=True, tracking=True, track_visibility="always", readonly=True,
                             states={'draft': [('readonly', False)]})
     sent_rfi = fields.Boolean(string="RFI Sent")
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+            company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+            if company[:1]:
+                self.company_id = company.id
+
+    @api.model
+    def create(self, vals):
+        res = super(AdminRequestForInformation,self).create(vals)
+        res.onchange_company_id()
+        res.onchange_company_code()
+        return res
 
     def submit_request(self):
         return self.write({

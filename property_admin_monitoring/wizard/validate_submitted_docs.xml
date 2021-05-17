@@ -23,9 +23,7 @@
                     </sheet>
                     <footer>
                         <button string="Confirm and Validate Submitted Documents" type="object"
-                                name="process_validated_docs" class="oe_highlight"
-                                confirm="Are you sure? Please note once you click 'OK' there is no Turning Back."
-                        />
+                                name="process_validated_docs" class="oe_highlight"/>
                         <button string="Cancel" class='oe_link' special="cancel"/>
                     </footer>
                 </form>

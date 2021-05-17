@@ -40,7 +40,7 @@
                     <field name="sap_religion"/>
                 </field>
                 <field name="profession_id" position="replace">
-                    <field name="profession_id" invisible="1"/>
+                    <field name="profession_id" invisible="1" string="Profession (Depricated)"/>
                     <field name="profession"/>
                 </field>
                 <page name="personal" position="after">

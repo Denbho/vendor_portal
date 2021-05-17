@@ -31,12 +31,13 @@ class AdminPurchaseRequisition(models.Model):
     _order = 'id desc'
 
     name = fields.Char(string='PR No.', required=True, copy=False, default=lambda self: _('New'))
-    company_id = fields.Many2one('res.company', 'Company', required=True, index=True,
+    company_id = fields.Many2one('res.company', 'Company', index=True,
                                  default=lambda self: self.env.company)
+    company_code = fields.Char(string='Company Code')
     pr_doc_type_id = fields.Many2one('pr.document.type', 'PR Document Type', domain="[('company_id','=',company_id)]")
     pr_doc_type_code = fields.Char(string='PR Document Type Code')
     warehouse_id = fields.Many2one('location.plant', 'Plant', domain="[('company_id','=',company_id)]")
-    plant_code = fields.Char(string='Plant Code')
+    plant_code = fields.Char(string='Plant Code', domain="[('company_id','=',company_id)]")
     target_delivery_date = fields.Date(string="Target Delivery Date")
     pr_line = fields.One2many('purchase.requisition.material.details', 'request_id', string='Material Details Lines',
                               copy=True, auto_join=True)
@@ -47,28 +48,53 @@ class AdminPurchaseRequisition(models.Model):
                              required=True,
                              copy=False,
                              default='unreleased')
-    material_details_count = fields.Integer(compute='_compute_material_details_count', string='Material Details Count')
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+            company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+            if company[:1]:
+                self.company_id = company.id
 
     @api.onchange('warehouse_id')
     def onchange_plant(self):
         if self.warehouse_id:
             self.plant_code = self.warehouse_id.code
 
+    @api.onchange('plant_code')
+    def onchange_plant_code(self):
+        if self.plant_code:
+            plant_id = self.env['location.plant'].sudo().search([('code','=',self.plant_code)], limit=1)
+            if plant_id[:1]:
+                self.warehouse_id = plant_id[0].id
+
     @api.onchange('pr_doc_type_id')
     def onchange_pr_doc_type_id(self):
         if self.pr_doc_type_id:
             self.pr_doc_type_code = self.pr_doc_type_id.code
 
+    @api.onchange('pr_doc_type_code')
+    def onchange_pr_doc_type_code(self):
+        if self.pr_doc_type_code:
+            pr_doc_type_id = self.env['pr.document.type'].sudo().search([('code','=',self.pr_doc_type_code)], limit=1)
+            if pr_doc_type_id[:1]:
+                self.pr_doc_type_id = pr_doc_type_id[0].id
+
     @api.model
     def create(self, vals):
         res = super(AdminPurchaseRequisition,self).create(vals)
+        res.onchange_company_id()
+        res.onchange_company_code()
         res.onchange_plant()
+        res.onchange_plant_code()
         res.onchange_pr_doc_type_id()
+        res.onchange_pr_doc_type_code()
         return res
-
-    def _compute_material_details_count(self):
-        for record in self:
-            record.material_details_count = len(self.pr_line)
 
     @api.onchange('company_id')
     def onchange_company_id(self):
@@ -114,15 +140,17 @@ class PurchaseRequisitionMaterialDetails(models.Model):
     _order = 'id'
     _rec_name = 'product_id'
 
-    request_id = fields.Many2one('admin.purchase.requisition', string='PR Reference', required=True, ondelete='cascade',
+    request_id = fields.Many2one('admin.purchase.requisition', string='PR No.', required=True, ondelete='cascade',
                                  index=True, copy=False)
     company_id = fields.Many2one('res.company', string='Company')
-    product_id = fields.Many2one('product.product', string='Material', required=True)
+    company_code = fields.Char(string='Company Code')
+    product_id = fields.Many2one('product.product', string='Material')
     product_categ_id = fields.Many2one('product.category', string='Material Group')
     material_description = fields.Text(string='Material Description')
     material_code = fields.Char(string='Material Code / SKU')
     latest_price = fields.Text(string='Latest Price')
     acct_assignment_categ = fields.Many2one('acct.assignment.category', string='Acct. Assignment Category')
+    acct_assignment_categ_code = fields.Char(string='Acct. Assignment Category Code')
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure')
     quantity = fields.Integer(string="Material Quantity", default=1)
     release_indicator = fields.Selection(selection=_RELEASE_INDICATOR, string='Release Indicator', default='unreleased')
@@ -133,10 +161,12 @@ class PurchaseRequisitionMaterialDetails(models.Model):
     location_code = fields.Char(string='Storage Location Code')
     target_delivery_date = fields.Date(string="Target Delivery Date")
     requisitioner_id = fields.Many2one('purchase.requisitioner', string='Requisitioner')
+    requisitioner_code = fields.Char(string='Requisitioner Code')
     pr_releaser_id = fields.Many2one('res.partner', string='PR Releaser')
     asset_code = fields.Char(string='Asset Code')
     unloading_point = fields.Char(string='Unloading Point')
     purchasing_group_id = fields.Many2one('purchasing.group', string='Purchasing Group')
+    purchasing_group_code = fields.Char(string='Purchasing Group Code')
     network = fields.Char(string='Network')
     internal_order = fields.Char(string='Internal Order')
     processing_status = fields.Char(string='Processing Status')
@@ -145,21 +175,93 @@ class PurchaseRequisitionMaterialDetails(models.Model):
     rfq_line_id = fields.Many2one('admin.request.for.quotation.line', string='RFQ Line')
     state = fields.Selection(selection=[('pending', 'Pending'), ('done', 'Done')], string='Status', default='pending')
 
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+            company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+            if company[:1]:
+                self.company_id = company.id
+
     @api.onchange('warehouse_id')
     def onchange_plant(self):
         if self.warehouse_id:
             self.plant_code = self.warehouse_id.code
+
+    @api.onchange('plant_code')
+    def onchange_plant_code(self):
+        if self.plant_code:
+            plant_id = self.env['location.plant'].sudo().search([('code','=',self.plant_code)], limit=1)
+            if plant_id[:1]:
+                self.warehouse_id = plant_id[0].id
 
     @api.onchange('location')
     def onchange_location(self):
         if self.location:
             self.location_code = self.location.code
 
+    @api.onchange('location_code')
+    def onchange_location_code(self):
+        if self.location_code:
+            location_id = self.env['stock.location'].sudo().search([('code','=',self.location_code)], limit=1)
+            if location_id[:1]:
+                self.location = location_id[0].id
+
+    @api.onchange('acct_assignment_categ')
+    def onchange_acct_assignment_categ(self):
+        if self.acct_assignment_categ:
+            self.acct_assignment_categ_code = self.acct_assignment_categ.code
+
+    @api.onchange('acct_assignment_categ_code')
+    def onchange_acct_assignment_categ_code(self):
+        if self.acct_assignment_categ_code:
+            acct_assignment_categ_id = self.env['acct.assignment.category'].sudo().search([('code','=',self.acct_assignment_categ_code)], limit=1)
+            if acct_assignment_categ_id[:1]:
+                self.acct_assignment_categ = acct_assignment_categ_id[0].id
+
+    @api.onchange('requisitioner_id')
+    def onchange_requisitioner_id(self):
+        if self.requisitioner_id:
+            self.requisitioner_code = self.requisitioner_id.code
+
+    @api.onchange('requisitioner_code')
+    def onchange_requisitioner_code(self):
+        if self.requisitioner_code:
+            requisitioner_id = self.env['purchase.requisitioner'].sudo().search([('code','=',self.requisitioner_code)], limit=1)
+            if requisitioner_id[:1]:
+                self.acct_assignment_categ = requisitioner_id[0].id
+
+    @api.onchange('purchasing_group_id')
+    def onchange_purchasing_group_id(self):
+        if self.purchasing_group_id:
+            self.requisitioner_code = self.purchasing_group_id.code
+
+    @api.onchange('purchasing_group_code')
+    def onchange_purchasing_group_code(self):
+        if self.purchasing_group_code:
+            purchasing_group_id = self.env['purchasing.group'].sudo().search([('code','=',self.purchasing_group_code)], limit=1)
+            if purchasing_group_id[:1]:
+                self.purchasing_group_id = purchasing_group_id[0].id
+
     @api.model
     def create(self, vals):
         res = super(PurchaseRequisitionMaterialDetails,self).create(vals)
+        res.onchange_company_id()
+        res.onchange_company_code()
         res.onchange_plant()
+        res.onchange_plant_code()
         res.onchange_location()
+        res.onchange_location_code()
+        res.onchange_acct_assignment_categ()
+        res.onchange_acct_assignment_categ_code()
+        res.onchange_requisitioner_id()
+        res.onchange_requisitioner_code()
+        res.onchange_purchasing_group_id()
+        res.onchange_purchasing_group_code()
         return res
 
     @api.onchange('product_id')

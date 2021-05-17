@@ -509,14 +509,14 @@
                                 attrs="{'invisible': ['|', ('for_cancellation', '=', True), ('cancellation_date', 'not in', [False])]}"
                                 icon="fa-ban"
                                 name="%(property_request_account_cancel_action_wizard)d" class="oe_highlight"/>
-                        <button help="Move to the Next Stage" type="object"
+                        <button help="Move to the Next Stage" type="object" confirm="Are you sure? Please note once you click 'OK' there is no Turning Back."
                                 attrs="{'invisible': ['|', ('for_cancellation', '=', True), ('cancellation_date', 'not in', [False])]}"
                                 name="move_to_next_stage" class="oe_highlight" icon="fa-step-forward"/>
                         <button string="Check Request Convert to CS Status" type="object"
                                 attrs="{'invisible': ['|', ('contracted_sale_date', 'not in', [False]), ('ready_for_contracted_sale', '=', False)]}"
                                 name="check_for_contracted_sale_request_status" class="oe_link"
                                 icon="fa-hourglass-half"/>
-                        <button string="Release Adv-Com" type="object"
+                        <button string="Release Adv-Com" type="object" confirm="Are you sure? Please note once you click 'OK' there is no Turning Back."
                                 attrs="{'invisible': ['|', '|', ('request_released_commission', '=', True), ('for_cancellation', '=', True), ('cancellation_date', 'not in', [False])]}"
                                 name="set_release_advance_commission" class="oe_highlight" icon="fa-check-square-o"/>
                         <button string="Check Adv-Com Status" type="object"
@@ -573,7 +573,7 @@
                             <group>
                                 <field name="partner_id" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
                                 <field name="customer_number"/>
-                                <field name="employment_status_id"/>
+                                <field name="employment_status_id" required="1" readonly="1" force_save="1"/>
                                 <field name="company_id" groups="base.group_multi_company"
                                        options="{'no_quick_create': True, 'no_create_edit' : True}"/>
                                 <field name="company_code" required="1"/>
@@ -645,6 +645,7 @@
                         </group>
                         <group>
                             <group>
+                                <field name="reservation_fee"/>
                                 <field name="dp_percent"/>
                                 <field name="dp_amount"/>
                                 <field name="dp_terms"/>
@@ -703,7 +704,9 @@
                                         <field name="su_number"/>
                                         <field name="block_lot"/>
                                         <field name="property_type"/>
-                                        <field name="model_type_id"/>
+                                        <field name="model_type_id" invisible="1"/>
+                                        <field name="unit_type"/>
+                                        <field name="house_series"/>
                                         <field name="model_unit_type_id"/>
                                         <field name="category"/>
                                         <label for="lot_area"
@@ -751,6 +754,10 @@
                                                groups="property_admin_monitoring.group_property_admin,account.group_account_manager"/>
                                     </group>
                                     <group>
+                                        <field name="condo_price"
+                                               groups="property_admin_monitoring.group_property_admin,account.group_account_manager"/>
+                                        <field name="premium_price"
+                                               groups="property_admin_monitoring.group_property_admin,account.group_account_manager"/>
                                         <field name="house_price"
                                                groups="property_admin_monitoring.group_property_admin,account.group_account_manager"/>
                                         <field name="house_repair_price"
@@ -776,17 +783,19 @@
                                         <field name="so_date"/>
                                         <label for="recontract_rs_date"/>
                                         <div>
-                                            <field name="recontract_rs_date" class="oe_inline"/>
+                                            <field name="recontracted_one" class="oe_inline"/>
+                                            <field name="recontract_rs_date" class="oe_inline" invisible="1"/>
                                             <field name="recontracted_so_number" class="oe_inline"
                                                    placeholder="Recontracted SO Ref."
-                                                   attrs="{'invisible': [('recontract_rs_date', '=', False)]}"/>
+                                                   attrs="{'invisible': [('recontracted_one', '=', False)]}"/>
                                         </div>
                                         <label for="recontract_rs_date2"/>
                                         <div>
-                                            <field name="recontract_rs_date2" class="oe_inline"/>
+                                            <field name="recontracted_two" class="oe_inline"/>
+                                            <field name="recontract_rs_date2" class="oe_inline" invisible="1"/>
                                             <field name="recontracted_so_number2" class="oe_inline"
                                                    placeholder="Recontracted SO Ref."
-                                                   attrs="{'invisible': [('recontract_rs_date2', '=', False)]}"/>
+                                                   attrs="{'invisible': [('recontracted_two', '=', False)]}"/>
                                         </div>
                                         <label for="buyback"/>
                                         <div>

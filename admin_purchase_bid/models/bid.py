@@ -98,7 +98,8 @@ class PurchaseBid(models.Model):
             self.bid_summary = bid_summary
 
     name = fields.Char(string='Bid', required=True, copy=False, default=lambda self: _('New'), readonly=True)
-    company_id = fields.Many2one('res.company', 'Company', required=True, default=lambda self: self.env.company, track_visibility='onchange')
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.company, track_visibility='onchange')
+    company_code = fields.Char(string='Company Code', track_visibility='onchange')
     project_name = fields.Char(string='Project Name', required=True, track_visibility='onchange')
     project_location = fields.Char(string='Project Location', track_visibility='onchange')
     wbs_element = fields.Char(string='Wbs Element', track_visibility='onchange')
@@ -170,6 +171,18 @@ class PurchaseBid(models.Model):
                              copy=False,
                              default='draft')
 
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+          company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+          if company[:1]:
+              self.company_id = company.id
+
     @api.onchange('deadline_of_submission')
     def onchange_deadline_of_submission(self):
         if self.deadline_of_submission and self.bid_opening_date:
@@ -216,6 +229,8 @@ class PurchaseBid(models.Model):
         res = super(PurchaseBid, self).create(values)
         if 'pr_related_ids' in values:
             self.validate_related_pr(res.id, values['pr_related_ids'][0][2], "create")
+        res.onchange_company_id()
+        res.onchange_company_code()
         return res
 
     def write(self, values):

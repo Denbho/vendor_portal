@@ -12,11 +12,6 @@
                         <field name="state" widget="statusbar" statusbar_visible="unreleased,released"/>
                     </header>
                     <sheet>
-                        <div class="oe_button_box" name="button_box">
-                            <button class="oe_stat_button" name="action_view_material_details_pivot" type="object" icon="fa-sitemap">
-                                <field string="Material Details" name="material_details_count" widget="statinfo"/>
-                            </button>
-                        </div>
                         <div class="oe_read_only">
                             <h1>
                                 <field name="company_id"/> -
@@ -26,20 +21,29 @@
                         <group>
                             <group>
                                 <field name="name"/>
-                                <field name="company_id" groups="base.group_multi_company"
-                                       options="{'no_create': True}"/>
-                                <field name="pr_doc_type_id"/>
-                                <field name="pr_doc_type_code"/>
-                            </group>
-                            <group>
-                                <field name="warehouse_id"/>
-                                <field name="plant_code"/>
+                                <label for="company_id"/>
+                                <div>
+                                    [<field name="company_code" class="oe_inline"/>]
+                                    <field name="company_id" groups="base.group_multi_company" class="oe_inline"
+                                           options="{'no_create': True}" required="1"/>
+                                </div>
+                                <label for="pr_doc_type_id"/>
+                                <div>
+                                    [<field name="pr_doc_type_code" class="oe_inline"/>]
+                                    <field name="pr_doc_type_id" class="oe_inline"/>
+                                </div>
+                                <label for="warehouse_id"/>
+                                <div>
+                                    [<field name="plant_code" class="oe_inline"/>]
+                                    <field name="warehouse_id" class="oe_inline"/>
+                                </div>
                                 <field name="target_delivery_date"/>
                             </group>
                         </group>
+
                         <separator string="Material Details"/>
                         <field name="pr_line" widget="one2many_list" mode="tree"
-                               context="{'default_company_id': company_id, 'default_warehouse_id': warehouse_id,
+                               context="{'default_company_id': company_id, 'default_company_code': company_code, 'default_warehouse_id': warehouse_id,
                                'default_plant_code': plant_code, 'default_target_delivery_date': target_delivery_date}">
                             <tree string="Material Details" default_order="id">
                                 <field name="product_id"/>
@@ -58,6 +62,7 @@
                                 <field name="pr_releaser_id" optional="hide"/>
                                 <field name="purchasing_group_id" optional="hide"/>
                                 <field name="company_id" optional="hide"/>
+                                <field name="company_code" optional="hide"/>
                                 <field name="warehouse_id" optional="hide"/>
                                 <field name="plant_code" optional="hide"/>
                                 <field name="location" optional="hide"/>
@@ -83,6 +88,7 @@
                 <tree string="Purchase Requests">
                     <field name="name"/>
                     <field name="company_id"/>
+                    <field name="company_code"/>
                     <field name="pr_doc_type_id"/>
                     <field name="pr_doc_type_code"/>
                     <field name="warehouse_id"/>
@@ -100,6 +106,7 @@
                 <search string="Purchase Requests">
                     <field name="name" string="PR No."/>
                     <field name="company_id"/>
+                    <field name="company_code"/>
                     <field name="pr_doc_type_id"/>
                     <field name="pr_doc_type_code"/>
                     <field name="warehouse_id"/>
@@ -109,11 +116,11 @@
                     <separator/>
                     <filter string="Target Delivery Date" name="target_delivery_date" date="target_delivery_date"/>
                     <group expand="0" string="Group By">
-                        <filter string="Company" name="group_company_id" context="{'group_by': 'company_id'}"/>
-                        <filter string="PR Document Type" name="group_pr_doc_type_id" context="{'group_by': 'pr_doc_type_id'}"/>
-                        <filter string="Plant" name="group_warehouse_id" context="{'group_by': 'warehouse_id'}"/>
-                        <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
-                        <filter string="Target Delivery Date" name="group_target_delivery_date" domain="[]" context="{'group_by': 'target_delivery_date'}"/>
+                        <filter string="Company" name="grp_company_id" context="{'group_by': 'company_id'}"/>
+                        <filter string="PR Document Type" name="grp_pr_doc_type_id" context="{'group_by': 'pr_doc_type_id'}"/>
+                        <filter string="Plant" name="grp_warehouse_id" context="{'group_by': 'warehouse_id'}"/>
+                        <filter string="Status" name="grp_state" context="{'group_by': 'state'}"/>
+                        <filter string="Target Delivery Date" name="grp_target_delivery_date" domain="[]" context="{'group_by': 'target_delivery_date'}"/>
                     </group>
                 </search>
             </field>
@@ -125,8 +132,6 @@
             <field name="res_model">admin.purchase.requisition</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="admin_purchase_requisition_view_tree"/>
-            <field name="domain">[]</field>
-            <field name="context">{}</field>
             <field name="search_view_id" ref="view_purchase_requisition_search"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
@@ -146,6 +151,44 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="pr_material_details_tree">
+            <field name="name">purchase.requisition.material.details.tree</field>
+            <field name="model">purchase.requisition.material.details</field>
+            <field name="arch" type="xml">
+              <tree string="PR Material Details" default_order="id">
+                  <field name="request_id"/>
+                  <field name="product_id"/>
+                  <field name="product_categ_id"/>
+                  <field name="material_description" optional="hide"/>
+                  <field name="material_code" optional="hide"/>
+                  <field name="quantity"/>
+                  <field name="product_uom"/>
+                  <field name="latest_price" widget="html" optional="hide"/>
+                  <field name="acct_assignment_categ" optional="hide"/>
+                  <field name="cost_center_id" optional="hide"/>
+                  <field name="release_indicator" optional="hide"/>
+                  <field name="sourcing" optional="hide"/>
+                  <field name="processing_status" optional="hide"/>
+                  <field name="requisitioner_id" optional="hide"/>
+                  <field name="pr_releaser_id" optional="hide"/>
+                  <field name="purchasing_group_id" optional="hide"/>
+                  <field name="company_id" optional="hide"/>
+                  <field name="company_code" optional="hide"/>
+                  <field name="warehouse_id" optional="hide"/>
+                  <field name="plant_code" optional="hide"/>
+                  <field name="location" optional="hide"/>
+                  <field name="location_code" optional="hide"/>
+                  <field name="unloading_point" optional="hide"/>
+                  <field name="network" optional="hide"/>
+                  <field name="asset_code" optional="hide"/>
+                  <field name="internal_order" optional="hide"/>
+                  <field name="target_delivery_date" optional="hide"/>
+                  <field name="rfq_id" optional="hide"/>
+                  <field name="state" invisible="1"/>
+              </tree>
+            </field>
+        </record>
+
         <record id="purchase_requisition_material_details_form" model="ir.ui.view">
             <field name="name">purchase.requisition.material.details.form</field>
             <field name="model">purchase.requisition.material.details</field>
@@ -154,27 +197,50 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="product_id"/>
+                                <field name="product_id" required="1"/>
                                 <field name="product_categ_id"/>
                                 <field name="material_code"/>
                                 <field name="material_description"/>
                                 <field name="quantity"/>
                                 <field name="product_uom"/>
-                                <field name="company_id" readonly="1" force_save="1"/>
-                                <field name="warehouse_id"/>
-                                <field name="plant_code"/>
-                                <field name="location" domain="[('company_id','=',company_id)]"/>
-                                <field name="location_code"/>
+                                <label for="company_id"/>
+                                <div>
+                                    [<field name="company_code" class="oe_inline" readonly="1" force_save="1"/>]
+                                    <field name="company_id" groups="base.group_multi_company" class="oe_inline"
+                                            readonly="1" force_save="1"/>
+                                </div>
+                                <label for="warehouse_id"/>
+                                <div>
+                                    [<field name="plant_code" class="oe_inline"/>]
+                                    <field name="warehouse_id" class="oe_inline"/>
+                                </div>
+                                <label for="location"/>
+                                <div>
+                                    [<field name="location_code" class="oe_inline"/>]
+                                    <field name="location" class="oe_inline"/>
+                                </div>
                             </group>
                             <group>
-                                <field name="acct_assignment_categ"/>
+                                <label for="acct_assignment_categ"/>
+                                <div>
+                                    [<field name="acct_assignment_categ_code" class="oe_inline"/>]
+                                    <field name="acct_assignment_categ" class="oe_inline"/>
+                                </div>
                                 <field name="cost_center_id"/>
                                 <field name="release_indicator" readonly="1"/>
                                 <field name="sourcing"/>
                                 <field name="processing_status" readonly="1"/>
-                                <field name="requisitioner_id"/>
+                                <label for="requisitioner_id"/>
+                                <div>
+                                    [<field name="requisitioner_code" class="oe_inline"/>]
+                                    <field name="requisitioner_id" class="oe_inline"/>
+                                </div>
                                 <field name="pr_releaser_id"/>
-                                <field name="purchasing_group_id"/>
+                                <label for="purchasing_group_id"/>
+                                <div>
+                                    [<field name="purchasing_group_code" class="oe_inline"/>]
+                                    <field name="purchasing_group_id" class="oe_inline"/>
+                                </div>
                                 <field name="unloading_point"/>
                                 <field name="network" readonly="1"/>
                                 <field name="asset_code"/>
@@ -190,6 +256,53 @@
                     </sheet>
                 </form>
             </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_pr_material_details_search">
+            <field name="name">purchase.requisition.material.details.search</field>
+            <field name="model">purchase.requisition.material.details</field>
+            <field name="arch" type="xml">
+                <search string="PR Material Details Search">
+                    <field name="request_id"/>
+                    <field name="product_id"/>
+                    <field name="material_code"/>
+                    <field name="company_id"/>
+                    <field name="company_code"/>
+                    <field name="sourcing"/>
+                    <field name="rfq_id"/>
+                    <filter string="Released" name="released" domain="[('release_indicator', '=', 'released')]" help="PR Released"/>
+                    <filter string="Unreleased" name="unreleased" domain="[('release_indicator', '=', 'unreleased')]" help="Unreleased PR"/>
+                    <separator/>
+                    <filter string="Target Delivery Date" name="target_delivery_date" date="target_delivery_date"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Material" name="grp_product_id" context="{'group_by': 'product_id'}"/>
+                        <filter string="Material Group" name="grp_product_categ_id" context="{'group_by': 'product_categ_id'}"/>
+                        <separator/>
+                        <filter string="Company" name="grp_company_id" context="{'group_by': 'company_id'}"/>
+                        <filter string="Plant" name="grp_warehouse_id" context="{'group_by': 'warehouse_id'}"/>
+                        <filter string="Storage Location" name="grp_location" context="{'group_by': 'location'}"/>
+                        <filter string="Acct. Assignment Category" name="grp_acct_assignment_categ" context="{'group_by': 'acct_assignment_categ'}"/>
+                        <filter string="Requisitioner" name="grp_requisitioner_id" context="{'group_by': 'requisitioner_id'}"/>
+                        <filter string="Purchasing Group" name="grp_purchasing_group_id" context="{'group_by': 'purchasing_group_id'}"/>
+                        <separator/>
+                        <filter string="Release Indicator" name="grp_release_indicator" context="{'group_by': 'release_indicator'}"/>
+                        <filter string="Sourcing" name="grp_sourcing" context="{'group_by': 'sourcing'}"/>
+                        <separator/>
+                        <filter string="RFQ No." name="grp_rfq_id" context="{'group_by': 'rfq_id'}"/>
+                        <separator/>
+                        <filter string="Target Delivery Date" name="grp_target_delivery_date" domain="[]" context="{'group_by': 'target_delivery_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="admin_pr_material_details_form_action" model="ir.actions.act_window">
+            <field name="name">PR Material Details</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">purchase.requisition.material.details</field>
+            <field name="view_mode">tree,form,pivot</field>
+            <field name="view_id" ref="pr_material_details_tree"/>
+            <field name="search_view_id" ref="view_pr_material_details_search"/>
         </record>
 
         <record id="acct_assignment_categ_view_tree" model="ir.ui.view">
@@ -332,8 +445,11 @@
                   sequence="5"/>
         <menuitem id="menu_admin_purchase_requisition" name="Sourcing" parent="purchase.menu_purchase_root"
                   sequence="0"/>
-        <menuitem id="menu_admin_purchase_requests" name="Purchase Requests" parent="menu_admin_purchase_requisition"
+        <menuitem id="menu_admin_purchase_requests" name="Purchase Requests" parent="menu_admin_purchase_requisition" sequence="1"/>
+        <menuitem id="menu_admin_pr_details" name="PR Details" parent="menu_admin_purchase_requests"
                   action="admin_purchase_requisition_form_action" sequence="1"/>
+        <menuitem id="menu_admin_pr_material_details" name="PR Material Details" parent="menu_admin_purchase_requests"
+                  action="admin_pr_material_details_form_action" sequence="2"/>
         <menuitem id="admin_request_for_quotation.admin_request_for_quotation_menu" name="Request For Quotation"
                   parent="menu_admin_purchase_requisition" sequence="2"/>
     </data>

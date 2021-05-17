@@ -115,7 +115,7 @@ class PropertyLedgerPaymentItem(models.Model):
     sap_datetime_sync = fields.Datetime(string="SAP Datetime Sync")
 
     _sql_constraints = [
-        ('so_number_client_line_counter', 'unique(soa_number, sap_client_id, line_counter)',
+        ('so_number_client_line_counter', 'unique(so_number, sap_client_id, line_counter)',
          "Duplicate of payments is not allowed in the so number, client_id and line_counter!")
     ]
 

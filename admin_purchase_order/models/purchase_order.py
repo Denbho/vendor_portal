@@ -23,16 +23,39 @@ class PurchaseOrder(models.Model):
     vendor_payment_count = fields.Integer(compute="_compute_vendor_payment_count")
     po_doc_type_id = fields.Many2one('admin.po.document.type', string='PO Document Type', domain="[('company_id','=',company_id)]")
     po_doc_type_code = fields.Char(string='PO Document Type Code')
+    company_code = fields.Char(string='Company Code')
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        if self.company_id:
+            self.company_code = self.company_id.code
+
+    @api.onchange('company_code')
+    def onchange_company_code(self):
+        if self.company_code:
+            company = self.env['res.company'].sudo().search([('code', '=', self.company_code)], limit=1)
+            if company[:1]:
+                self.company_id = company.id
+
 
     @api.onchange('po_doc_type_id')
     def onchange_po_doc_type_id(self):
         if self.po_doc_type_id:
             self.po_doc_type_code = self.po_doc_type_id.code
 
+    @api.onchange('po_doc_type_code')
+    def onchange_po_doc_type_code(self):
+        if self.po_doc_type_code:
+            po_doc_type_id = self.env['admin.po.document.type'].sudo().search([('code', '=', self.po_doc_type_code)], limit=1)
+            if po_doc_type_id[:1]:
+                self.po_doc_type_id = po_doc_type_id.id
     @api.model
     def create(self, vals):
         res = super(PurchaseOrder,self).create(vals)
         res.onchange_po_doc_type_id()
+        res.onchange_po_doc_type_code()
+        res.onchange_company_id()
+        res.onchange_company_code()
         return res
 
     def _compute_vendor_payment_count(self):
@@ -159,6 +182,7 @@ class PODeliveryLine(models.Model):
     delivered_by = fields.Char(string="Delivered By")
     received_by = fields.Char(string="Received By")
     company_id = fields.Many2one('res.company', string="Company", store=True, related="po_id.company_id")
+    company_code = fields.Char(string="Company Code", store=True, related="po_id.company_code")
     po_id = fields.Many2one('purchase.order', string='PO #')
     product_line = fields.One2many('po.delivery.product.line', 'po_delivery_id', string='Product Lines')
     received_original_doc = fields.Boolean(string="Received Original Docs")

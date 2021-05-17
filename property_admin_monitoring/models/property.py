@@ -56,28 +56,45 @@ class HousingModel(models.Model):
 
     active = fields.Boolean(default=True)
     name = fields.Char(string="Model", required=True, track_visibility="always")
+    # property_type = fields.Selection([
+    #     ('House and Lot', 'House and Lot'),
+    #     ('House & Lot', 'House & Lot'),
+    #     ('House Only', 'House Only'),
+    #     ('Condo', 'Condo Unit'),
+    #     ('Parking Condo', 'Condo and Parking'),
+    #     ('Lot Only', 'Lot Only'),
+    #     ('Parking Only', 'Parking Only'),
+    #     ('Others', 'Others')
+    # ], string="Usage Type", default="House", required=True)
+
     property_type = fields.Selection([
-        ('House and Lot', 'House and Lot'),
+        ('Combo Condo Unit', 'Combo Condo Unit'),
+        ('Condo Parking', 'Condo Parking'),
+        ('Condo', 'Condo Only'),
+        ('Combo House & Lot', 'Combo House & Lot'),
         ('House & Lot', 'House & Lot'),
         ('House Only', 'House Only'),
-        ('Condo', 'Condo Unit'),
-        ('Parking Condo', 'Condo and Parking'),
         ('Lot Only', 'Lot Only'),
-        ('Parking Only', 'Parking Only'),
-        ('Others', 'Others')
-    ], string="Usage Type", default="House", required=True)
+        ('Combo Lot Only', 'Combo Lot Only'),
+        ('unspecified', 'Unspecified')
+    ], string="Usage Type", defualt="unspecified", required=False)
+
     model_type_id = fields.Many2one("property.model.type", string="House Class", track_visibility="always")
     description = fields.Html(string="Description", track_visibility="always")
     year_month = fields.Char(string="Year Month", track_visibility="always")
     material_number = fields.Char(string="Material Number", track_visibility="always", required=True)
     image = fields.Binary(string="Image")
     model_blue_print = fields.Binary(string="Blue Print", attachment=True, store=True)
+    house_series = fields.Char(string="House Series", track_visibility="always")
+    unit_type = fields.Char(string="Unit Type", track_visibility="always")
 
     @api.model
     def create(self, vals):
         if vals.get('property_type') and vals.get('property_type') == 'House & Lot':
             vals['property_type'] = 'House and Lot'
-        if vals.get('property_type') and not vals.get('property_type') in ['House and Lot', 'House Only', 'Condo', 'Parking Condo', 'Lot Only', 'Parking Only', 'Others']:
+        if vals.get('property_type') and not vals.get('property_type') in ['House and Lot', 'House Only', 'Condo',
+                                                                           'Parking Condo', 'Lot Only', 'Parking Only',
+                                                                           'Others']:
             vals['property_type'] = 'Others'
         return super(HousingModel, self).create(vals)
 
@@ -271,6 +288,11 @@ class PropertyDetail(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Property Sales Units'
 
+    _sql_constraints = [
+        ('block_lot_be_code_key', 'unique(block_lot, be_code)',
+         "Duplicate of Block-Lot is not allowed in the same Project!")
+    ]
+
     active = fields.Boolean(default=True)
     company_id = fields.Many2one('res.company', 'Company', index=True, compute="_get_company", store=True,
                                  inverse="_inverse_get_company", track_visibility="always")
@@ -282,15 +304,16 @@ class PropertyDetail(models.Model):
     su_number = fields.Char(string="SU Number", required=True, track_visibility="always")
     block_lot = fields.Char(string="Block-Lot", required=True, track_visibility="always")
     property_type = fields.Selection([
-        ('House and Lot', 'House and Lot'),
+        ('Combo Condo Unit', 'Combo Condo Unit'),
+        ('Condo Parking', 'Condo Parking'),
+        ('Condo', 'Condo Only'),
+        ('Combo House & Lot', 'Combo House & Lot'),
+        ('House & Lot', 'House & Lot'),
         ('House Only', 'House Only'),
-        ('Condo', 'Condo Unit'),
-        ('Parking Condo', 'Condo and Parking'),
         ('Lot Only', 'Lot Only'),
-        ('Parking Only', 'Parking Only'),
-        ('Others', 'Others')
-    ],
-        string="Usage Type", track_visibility="always")
+        ('Combo Lot Only', 'Combo Lot Only'),
+        ('unspecified', 'Unspecified')
+    ], string="Usage Type", defualt="unspecified", track_visibility="always")
     state = fields.Selection([
         ('Ongoing', 'Ongoing'),
         ('NRFO', 'NRFO'),
@@ -313,7 +336,9 @@ class PropertyDetail(models.Model):
     house_model_description = fields.Text(string="House Model Description", track_visibility="always")
     material_number = fields.Char(string="Material Number", track_visibility="always")
     model_type_id = fields.Many2one("property.model.type", string="House Class", track_visibility="always")
-    model_unit_type_id = fields.Many2one("property.model.unit.type", string="Unit Type", track_visibility="always")
+    model_unit_type_id = fields.Many2one("property.model.unit.type", string="Unit Type (Depricated)", track_visibility="always")
+    house_series = fields.Char(string="House Series", store=True, related="house_model_id.unit_type")
+    unit_type = fields.Char(string="Unit Type", store=True, related="house_model_id.unit_type")
     # Property Details
     category = fields.Selection([('economic', 'Economic'), ('socialized', 'Socialized')], string="Series",
                                 track_visibility="always")
@@ -325,9 +350,10 @@ class PropertyDetail(models.Model):
     miscellaneous_value = fields.Monetary(string="MCC2", help="Miscellaneous Absolute Value")
     house_price = fields.Monetary(string="House Price")
     house_repair_price = fields.Monetary(string="House Repair Price", track_visibility="always")
-    parking_price = fields.Monetary(string="House Repair Price", track_visibility="always")
-    lot_price = fields.Monetary(string="Lot Price", compute="_get_contract_price",
-                                inverse="_inverse_get_contract_price", store=True)
+    parking_price = fields.Monetary(string="Parking Price", track_visibility="always")
+    lot_price = fields.Monetary(string="Lot Price", track_visibility="always")
+    condo_price = fields.Monetary(string="Condo Price", track_visibility="always")
+    premium_price = fields.Monetary(string="Premium Price", track_visibility="always")
     vat = fields.Monetary(string="VAT")
     miscellaneous_amount = fields.Monetary(string="Miscellaneous Amount")
     ntcp = fields.Monetary(string="NTCP", help="Total Net Contract Price")
@@ -358,13 +384,17 @@ class PropertyDetail(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('property_type') and vals.get('property_type') == 'House & Lot':
-            vals['property_type'] = 'House and Lot'
-        if vals.get('property_type') and not vals.get('property_type') in ['House and Lot', 'House Only', 'Condo', 'Parking Condo', 'Lot Only', 'Parking Only', 'Others']:
-            vals['property_type'] = 'Others'
+        if vals.get('property_type') and not (vals.get('property_type')).title() in ['Combo Condo Unit',
+                                                                                     'Condo Parking', 'Condo',
+                                                                                     'Combo House & Lot', 'House Only',
+                                                                                     'House & Lot', 'Lot Only',
+                                                                                     'Combo Lot Only']:
+            vals['property_type'] = 'unspecified'
+        else:
+            vals['property_type'] = (vals.get('property_type')).title()
         if vals.get('state') and vals.get('state') == 'NON-RFO':
             vals['state'] = 'NRFO'
-        if vals.get('property_type') and not vals.get('state') in ['Ongoing', 'NRFO', 'RFO', 'Lot Only', 'BTS', 'Others']:
+        if vals.get('state') and not vals.get('state') in ['Ongoing', 'NRFO', 'RFO', 'Lot Only', 'BTS', 'Others']:
             vals['state'] = 'Others'
         res = super(PropertyDetail, self).create(vals)
         res.onchange_company()
@@ -396,8 +426,8 @@ class PropertyDetail(models.Model):
             self.material_number = self.house_model_id.material_number
             if self.house_model_id.model_type_id:
                 self.model_type_id = self.house_model_id.model_type_id.id
-            if self.house_model_id.property_type:
-                self.property_type = self.house_model_id.property_type
+            # if self.house_model_id.property_type:
+            #     self.property_type = self.house_model_id.property_type
 
     @api.onchange('material_number')
     def onchange_get_project_house_model(self):
@@ -454,19 +484,19 @@ class PropertyDetail(models.Model):
                     [('range_from', '<=', i.tcp), ('range_to', '>=', i.tcp)], limit=1)
                 i.price_range_id = price_range[:1] and price_range.id or False
 
-    @api.depends('floor_area', 'floor_area_price', 'lot_area', 'lot_area_price',
-                 'miscellaneous_value', 'miscellaneous_charge', 'vat', 'parking_price', 'house_price')
-    def _get_contract_price(self):
-        for i in self:
-            house_price = roundup(i.floor_area * i.floor_area_price, 10)
-            lot_price = roundup(i.lot_area * i.lot_area_price, 10)
-            ntcp = sum([house_price, lot_price, i.parking_price, i.house_repair_price])
-            miscellaneous_amount = ntcp * (i.miscellaneous_charge / 100)
-            i.house_price = house_price
-            i.lot_price = lot_price
-            i.ntcp = ntcp
-            i.miscellaneous_amount = roundup(miscellaneous_amount + i.miscellaneous_value, 10)
-            i.tcp = roundup(sum([ntcp, miscellaneous_amount, i.vat, ]), 10)
-            price_range = self.env['property.price.range'].search(
-                [('range_from', '<=', i.tcp), ('range_to', '>=', i.tcp)], limit=1)
-            i.price_range_id = price_range[:1] and price_range.id or False
+    # @api.depends('floor_area', 'floor_area_price', 'lot_area', 'lot_area_price',
+    #              'miscellaneous_value', 'miscellaneous_charge', 'vat', 'parking_price', 'house_price')
+    # def _get_contract_price(self):
+    #     for i in self:
+    #         house_price = roundup(i.floor_area * i.floor_area_price, 10)
+    #         lot_price = roundup(i.lot_area * i.lot_area_price, 10)
+    #         ntcp = sum([house_price, lot_price, i.parking_price, i.house_repair_price])
+    #         miscellaneous_amount = ntcp * (i.miscellaneous_charge / 100)
+    #         i.house_price = house_price
+    #         i.lot_price = lot_price
+    #         i.ntcp = ntcp
+    #         i.miscellaneous_amount = roundup(miscellaneous_amount + i.miscellaneous_value, 10)
+    #         i.tcp = roundup(sum([ntcp, miscellaneous_amount, i.vat, ]), 10)
+    #         price_range = self.env['property.price.range'].search(
+    #             [('range_from', '<=', i.tcp), ('range_to', '>=', i.tcp)], limit=1)
+    #         i.price_range_id = price_range[:1] and price_range.id or False
